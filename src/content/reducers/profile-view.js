@@ -9,6 +9,9 @@ import * as StackTiming from '../stack-timing';
 import * as ProfileTree from '../profile-tree';
 import * as TaskTracer from '../task-tracer';
 import { getCategoryColorStrategy } from './flame-chart';
+import { None, Some } from '../../common/option';
+
+import type { Option } from '../../common/option';
 
 import type {
   Profile,
@@ -29,34 +32,32 @@ import type {
   ThreadViewOptions,
 } from './types';
 
-function profile(state: Profile | null = null, action: Action) {
+function profile(state: Option<Profile> = new None(), action: Action) {
   switch (action.type) {
     case 'RECEIVE_PROFILE_FROM_ADDON':
     case 'RECEIVE_PROFILE_FROM_WEB':
     case 'RECEIVE_PROFILE_FROM_FILE':
-      return action.profile;
+      return new Some(action.profile);
     case 'COALESCED_FUNCTIONS_UPDATE': {
-      if (state === null) {
-        return null;
-      }
-      const { functionsUpdatePerThread } = action;
-      const threads = state.threads.map((thread, threadIndex) => {
-        if (!functionsUpdatePerThread[threadIndex]) {
-          return thread;
-        }
-        const { oldFuncToNewFuncMap, funcIndices, funcNames } = functionsUpdatePerThread[threadIndex];
-        return setFuncNames(applyFunctionMerging(thread, oldFuncToNewFuncMap),
-                            funcIndices, funcNames);
+      return state.map(profile => {
+        const { functionsUpdatePerThread } = action;
+        const threads = profile.threads.map((thread, threadIndex) => {
+          if (!functionsUpdatePerThread[threadIndex]) {
+            return thread;
+          }
+          const { oldFuncToNewFuncMap, funcIndices, funcNames } = functionsUpdatePerThread[threadIndex];
+          return setFuncNames(applyFunctionMerging(thread, oldFuncToNewFuncMap),
+                              funcIndices, funcNames);
+        });
+        return Object.assign({}, profile, { threads });
       });
-      return Object.assign({}, state, { threads });
     }
     case 'ASSIGN_TASK_TRACER_NAMES': {
-      if (state === null) {
-        return null;
-      }
-      const { addressIndices, symbolNames } = action;
-      const tasktracer = setTaskTracerNames(state.tasktracer, addressIndices, symbolNames);
-      return Object.assign({}, state, { tasktracer });
+      return state.map(profile => {
+        const { addressIndices, symbolNames } = action;
+        const tasktracer = setTaskTracerNames(profile.tasktracer, addressIndices, symbolNames);
+        return Object.assign({}, profile, { tasktracer });
+      });
     }
     default:
       return state;
@@ -305,11 +306,11 @@ export const getTasksByThread = createSelector(
 /**
  * Profile
  */
-export const getProfile = (state: State): Profile => getProfileView(state).profile;
-export const getProfileInterval = (state: State): Milliseconds => getProfile(state).meta.interval;
-export const getThreads = (state: State): Thread[] => getProfile(state).threads;
-export const getThreadNames = (state: State): string[] => getProfile(state).threads.map(t => t.name);
-export const getProfileTaskTracerData = (state: State): Object => getProfile(state).tasktracer;
+export const getProfile = (state: State): Option<Profile> => getProfileView(state).profile;
+export const getProfileInterval = (state: State): Option<Milliseconds> => getProfile(state).map(profile => profile.meta.interval);
+export const getThreads = (state: State): Option<Thread[]> => getProfile(state).map(profile => profile.threads);
+export const getThreadNames = (state: State): Option<string[]> => getProfile(state).map(profile => profile.threads.map(t => t.name));
+export const getProfileTaskTracerData = (state: State): Option<Object> => getProfile(state).map(profile => profile.tasktracer);
 
 export type SelectorsForThread = {
   getThread: State => Thread,
@@ -337,7 +338,7 @@ const selectorsForThreads: { [key: ThreadIndex]: SelectorsForThread } = {};
 
 export const selectorsForThread = (threadIndex: ThreadIndex): SelectorsForThread => {
   if (!(threadIndex in selectorsForThreads)) {
-    const getThread = (state: State): Thread => getProfile(state).threads[threadIndex];
+    const getThread = (state: State): Option<Thread> => getProfile(state).map(profile => profile.threads[threadIndex]);
     const getViewOptions = (state: State): ThreadViewOptions => getProfileViewOptions(state).perThread[threadIndex];
     const getCallTreeFilters = (state: State): CallTreeFilter[] => URLState.getCallTreeFilters(state, threadIndex);
     const getCallTreeFilterLabels: (state: State) => string[] = createSelector(

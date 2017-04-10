@@ -60,16 +60,20 @@ export function doneSymbolicating(): ThunkAction {
     dispatch({ type: 'DONE_SYMBOLICATING' });
 
     // TODO - Do not use selectors here.
-    dispatch(({
-      toWorker: true,
-      type: 'PROFILE_PROCESSED',
-      profile: getProfile(getState()),
-    }: Action));
+    const profile = getProfile(getState());
 
-    dispatch(({
-      toWorker: true,
-      type: 'SUMMARIZE_PROFILE',
-    }: Action));
+    profile.map(profile => {
+      dispatch(({
+        toWorker: true,
+        type: 'PROFILE_PROCESSED',
+        profile,
+      }: Action));
+
+      dispatch(({
+        toWorker: true,
+        type: 'SUMMARIZE_PROFILE',
+      }: Action));
+    });
   };
 }
 

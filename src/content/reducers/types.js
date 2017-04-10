@@ -4,6 +4,7 @@ import type { Summary } from '../../common/summarize-profile';
 import type { Action, ExpandedSet, CallTreeFiltersPerThread, DataSource, ProfileSelection } from '../actions/types';
 import type { Milliseconds, StartEndRange } from '../../common/types/units';
 import type { IndexIntoMarkersTable, IndexIntoFuncTable, Profile, ThreadIndex } from '../../common/types/profile';
+import type { Option } from '../../common/option';
 
 export type Reducer<T> = (T, Action) => T;
 
@@ -26,7 +27,7 @@ export type ProfileViewState = {
     zeroAt: Milliseconds,
     tabOrder: number[],
   },
-  profile: Profile | null,
+  profile: Option<Profile>,
 };
 
 export type AppState = {
