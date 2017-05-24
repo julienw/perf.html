@@ -1,8 +1,8 @@
-import Worker from 'workerjs';
+import Worker from './fake-worker';
 
 const workerFiles = {
-  'zee-worker': '../../res/zee-worker.js',
-  'worker': '../../dist/worker.js',
+  'zee-worker': `${__dirname}/../../../res/zee-worker.js`,
+  'worker': `${__dirname}/../../worker/index.js`,
 };
 
 const workerInstances = [];
@@ -16,6 +16,7 @@ export default class {
 }
 
 export function shutdownWorkers() {
+  return;
   workerInstances.forEach(worker => worker.terminate());
   workerInstances.length = 0;
 }
