@@ -35,7 +35,6 @@ const baseConfig = {
     alias: {
       'redux-devtools/lib': path.join(__dirname, '..', '..', 'src'),
       'redux-devtools': path.join(__dirname, '..', '..', 'src'),
-      'react': path.join(__dirname, 'node_modules', 'react'),
     },
     extensions: ['.js'],
   },
