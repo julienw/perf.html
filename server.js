@@ -3,6 +3,7 @@ const WebpackDevServer = require('webpack-dev-server');
 const config = require('./webpack.config');
 const baseConfig = config[0];
 
+console.log(process.env.NODE_ENV);
 new WebpackDevServer(webpack(config), {
   contentBase: baseConfig.output.path,
   publicPath: baseConfig.output.publicPath,

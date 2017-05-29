@@ -88,6 +88,17 @@ const contentConfig = Object.assign({}, baseConfig, {
     chunkFilename: '[id].[hash].bundle.js',
     publicPath: '/',
   },
+  devServer: {
+    /*
+    contentBase: baseConfig.output.path,
+    publicPath: baseConfig.output.publicPath,
+    */
+    historyApiFallback: true,
+    port: 4242,
+    stats: {
+      colors: true,
+    },
+  },
 });
 
 if (process.env.NODE_ENV === 'production') {

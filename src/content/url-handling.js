@@ -82,6 +82,7 @@ export function urlFromState(urlState: URLState) {
 }
 
 export function stateFromCurrentLocation(): URLState {
+  console.log('location is', window.location);
   const pathname = window.location.pathname;
   const qString = window.location.search.substr(1);
   const hash = window.location.hash;
