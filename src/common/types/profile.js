@@ -24,11 +24,11 @@ export type ThreadIndex = number;
  * consists of the frame at the top of the stack, and the prefix for the stack that
  * came before it. Stacks can be shared between samples.
  */
-export type StackTable = {
+export type StackTable = {|
   frame: IndexIntoFrameTable[],
   prefix: Array<IndexIntoStackTable|null>,
   length: number,
-};
+|};
 
 /**
  * The Gecko Profiler records samples of what function was currently being executed, and
@@ -37,30 +37,30 @@ export type StackTable = {
  * information that is needed to represent that sampled function. Most of the entries
  * are indices into other tables.
  */
-export type SamplesTable = {
+export type SamplesTable = {|
   responsiveness: number[],
   stack: Array<IndexIntoStackTable|null>,
   time: number[],
   rss: any, // TODO
   uss: any, // TODO
   length: number,
-};
+|};
 
 /**
  * This is the base abstract class that marker payloads inherit from. This probably isn't
  * used directly in perf.html, but is provided here for mainly documentation purposes.
  */
-export type ProfilerMarkerPayload = {
+export type ProfilerMarkerPayload = {|
   type: string,
   startTime?: Milliseconds,
   endTime?: Milliseconds,
   stack?: Thread,
-};
+|};
 
 /**
  * Measurement for how long draw calls take for the compositor.
  */
-export type GPUMarkerPayload = {
+export type GPUMarkerPayload = {|
   type: "gpu_timer_query",
   startTime: Milliseconds, // Same as cpustart
   endTime: Milliseconds, // Same as cpuend
@@ -69,20 +69,20 @@ export type GPUMarkerPayload = {
   gpustart: Milliseconds, // Always 0.
   gpuend: Milliseconds, // The time the GPU took to execute the command.
   stack?: Thread,
-};
+|};
 
 /**
  * These markers have a start and end time.
  */
-export type ProfilerMarkerTracing = {
+export type ProfilerMarkerTracing = {|
   type: "tracing",
   startTime: Milliseconds, // Same as cpustart
   endTime: Milliseconds, // Same as cpuend
   stack?: Thread,
   interval: "start" | "end",
-} & (
-  { category?: string } |
-  {
+|} & (
+  {| category?: string |} |
+  {|
     category: "Paint",
     name: "RefreshDriverTick" |
       "FireScrollEvent" |
@@ -97,7 +97,7 @@ export type ProfilerMarkerTracing = {
       "NotifyDidPaint" |
       "LayerTransaction" |
       "Composite",
-  }
+  |}
   // TODO - Add more markers.
 );
 
@@ -105,13 +105,13 @@ export type ProfilerMarkerTracing = {
  * The payload for the UserTimings API. These are added through performance.measure()
  * and performance.mark(). https://developer.mozilla.org/en-US/docs/Web/API/Performance
  */
-export type UserTimingMarkerPayload = {
+export type UserTimingMarkerPayload = {|
   type: "UserTiming",
   startTime: Milliseconds,
   endTime: Milliseconds,
   name: string,
   entryType: "measure" | "mark",
-}
+|};
 
 /**
  * The union of all the different marker payloads that perf.html knows about, this is

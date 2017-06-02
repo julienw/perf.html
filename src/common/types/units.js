@@ -26,13 +26,13 @@ export type UnitIntervalOfProfileRange = number;
 /**
  * For the a viewport into the profile range.
  */
-export type HorizontalViewport = {
+export type HorizontalViewport = {|
   left: UnitIntervalOfProfileRange,
   right: UnitIntervalOfProfileRange,
   length: UnitIntervalOfProfileRange,
-}
+|}
 
-export type StartEndRange = { start: Milliseconds, end: Milliseconds };
+export type StartEndRange = {| start: Milliseconds, end: Milliseconds |};
 
 /**
  * This is not really a unit, but doesn't warrant a separate file.
