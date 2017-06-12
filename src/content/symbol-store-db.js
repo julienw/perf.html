@@ -45,7 +45,7 @@ export class SymbolStoreDB {
 
   _setupDB(dbName: string): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
-      const openReq = window.indexedDB.open(dbName, 2);
+      const openReq = (window.indexedDB: IDBFactory).open(dbName, 2);
       openReq.onerror = () => {
         if (openReq.error.name === 'VersionError') {
           // This error fires if the database already exists, and the existing
@@ -134,12 +134,12 @@ export class SymbolStoreDB {
       return new Promise((resolve, reject) => {
         const transaction = db.transaction('symbol-tables', 'readwrite');
         transaction.onerror = () => reject(transaction.error);
-        const store = transaction.objectStore('symbol-tables');
+        const store: IDBObjectStore<*, *> = transaction.objectStore('symbol-tables');
         const req = store.openCursor([debugName, breakpadId]);
         req.onsuccess = () => {
-          const cursor = (req.result: any);
+          const cursor = req.result;
           if (cursor) {
-            const value = (cursor: IDBCursorWithValue).value;
+            const value = cursor.value;
             value.lastUsedDate = new Date();
             const updateDateReq = cursor.update(value);
             const { addrs, index, buffer } = value;
@@ -178,14 +178,14 @@ export class SymbolStoreDB {
     });
   }
 
-  _deleteRecordsLastUsedBeforeDate(store: IDBObjectStore, beforeDate: Date, callback: () => void): void {
+  _deleteRecordsLastUsedBeforeDate(store: IDBObjectStore<*, *>, beforeDate: Date, callback: () => void): void {
     const lastUsedDateIndex = store.index('lastUsedDate');
     // Get a cursor that walks all records whose lastUsedDate is less than beforeDate.
     const cursorReq = lastUsedDateIndex.openCursor(
       window.IDBKeyRange.upperBound(beforeDate, true));
     // Iterate over all records in this cursor and delete them.
     cursorReq.onsuccess = () => {
-      const cursor: IDBCursor = (cursorReq: any).result;
+      const cursor = cursorReq.result;
       if (cursor) {
         cursor.delete().onsuccess = () => {
           cursor.continue();
@@ -196,14 +196,14 @@ export class SymbolStoreDB {
     };
   }
 
-  _deleteNLeastRecentlyUsedRecords(store: IDBObjectStore, n: number, callback: () => void): void {
+  _deleteNLeastRecentlyUsedRecords(store: IDBObjectStore<*, *>, n: number, callback: () => void): void {
     // Get a cursor that walks the records from oldest to newest
     // lastUsedDate.
     const lastUsedDateIndex = store.index('lastUsedDate');
     const cursorReq = lastUsedDateIndex.openCursor();
     let deletedCount = 0;
     cursorReq.onsuccess = () => {
-      const cursor: IDBCursor = (cursorReq: any).result;
+      const cursor = cursorReq.result;
       if (cursor) {
         const deleteReq = cursor.delete();
         deleteReq.onsuccess = () => {
@@ -220,12 +220,12 @@ export class SymbolStoreDB {
     };
   }
 
-  _count(store: IDBObjectStore, callback: (number) => void): void {
+  _count(store: IDBObjectStore<*, *>, callback: (number) => void): void {
     const countReq = store.count();
-    countReq.onsuccess = () => callback((countReq: any).result);
+    countReq.onsuccess = () => callback(countReq.result);
   }
 
-  _deleteLeastRecentlyUsedUntilCountIsNoMoreThanN(store: IDBObjectStore, n: number, callback: () => void): void {
+  _deleteLeastRecentlyUsedUntilCountIsNoMoreThanN(store: IDBObjectStore<*, *>, n: number, callback: () => void): void {
     this._count(store, symbolTableCount => {
       if (symbolTableCount > n) {
         // We'll need to remove at least one symbol table.
