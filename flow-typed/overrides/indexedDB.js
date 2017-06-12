@@ -7,26 +7,31 @@ declare interface IDBEnvironment {
 
 type IDBDirection = 'next' | 'nextunique' | 'prev' | 'prevunique';
 
+declare interface IDBVersionChangeEvent extends Event {
+  oldVersion: number,
+  newVersion: number | null,
+}
+
 // Implemented by window.indexedDB & worker.indexedDB
 declare interface IDBFactory {
   open(name: string, version?: number): IDBOpenDBRequest;
   deleteDatabase(name: string): IDBOpenDBRequest;
-  cmp(a: any, b: any): -1|0|1;
+  cmp<K>(a: K, b: K): -1|0|1;
 }
 
 declare interface IDBRequest<V> extends EventTarget {
   result: V,
   error: Error;
-  source: ?(IDBIndex<any, any, V> | IDBObjectStore<any, V> | IDBCursor<any, V>);
+  source: ?(IDBIndex<any, any, V> | IDBObjectStore<any, V> | IDBCursor<any, any, V>);
   transaction: IDBTransaction;
   readyState: 'pending'|'done';
-  onerror: (err: any) => mixed;
-  onsuccess: (e: any) => mixed;
+  onerror: (e: Event & { target: IDBRequest<V> }) => mixed;
+  onsuccess: (e: Event & { target: IDBRequest<V> }) => mixed;
 }
 
 declare interface IDBOpenDBRequest extends IDBRequest<IDBDatabase> {
-  onblocked: (e: any) => mixed;
-  onupgradeneeded: (e: any) => mixed;
+  onblocked: (e: IDBVersionChangeEvent & { target: IDBDatabase }) => mixed;
+  onupgradeneeded: (e: IDBVersionChangeEvent & { target: IDBDatabase }) => mixed;
 }
 
 declare interface IDBDatabase extends EventTarget {
@@ -40,9 +45,9 @@ declare interface IDBDatabase extends EventTarget {
   name: string;
   version: number;
   objectStoreNames: string[];
-  onabort: (e: any) => mixed;
-  onerror: (e: any) => mixed;
-  onversionchange: (e: any) => mixed;
+  onabort: (e: Event) => mixed;
+  onerror: (e: Event) => mixed;
+  onversionchange: (e: Event) => mixed;
 }
 
 declare interface IDBTransaction extends EventTarget {
@@ -51,10 +56,10 @@ declare interface IDBTransaction extends EventTarget {
   error: Error;
   mode: 'readonly'|'readwrite'|'versionchange';
   name: string;
-  objectStore(name: string): IDBObjectStore<*, *>;
-  onabort: (e: any) => mixed;
-  oncomplete: (e: any) => mixed;
-  onerror: (e: any) => mixed;
+  objectStore<K, V>(name: string): IDBObjectStore<K, V>;
+  onabort: (e: Event) => mixed;
+  oncomplete: (e: Event) => mixed;
+  onerror: (e: Event) => mixed;
 }
 
 declare interface IDBObjectStore<K, V> {
@@ -73,9 +78,9 @@ declare interface IDBObjectStore<K, V> {
   index<L>(indexName: string): IDBIndex<K, L, V>;
   indexNames: string[];
   name: string;
-  keyPath: string | string[];
-  openCursor(range?: K|IDBKeyRange<K>, direction?: IDBDirection): IDBRequest<IDBCursorWithValue<K, V> | null>;
-  openKeyCursor(range?: K|IDBKeyRange<K>, direction?: IDBDirection): IDBRequest<IDBCursor<K, V> | null>;
+  keyPath: string | string[] | null;
+  openCursor(range?: K|IDBKeyRange<K>, direction?: IDBDirection): IDBRequest<IDBCursorWithValue<K, K, V> | null>;
+  openKeyCursor(range?: K|IDBKeyRange<K>, direction?: IDBDirection): IDBRequest<IDBCursor<K, K, V> | null>;
   put(value: V, key?: K): IDBRequest<void>;
   transaction: IDBTransaction;
 }
@@ -84,36 +89,39 @@ declare interface IDBIndex<K, L, V> extends EventTarget {
   count(key?: L|IDBKeyRange<L>): IDBRequest<number>;
   get(key: L|IDBKeyRange<L>): IDBRequest<V>;
   getKey(key: L|IDBKeyRange<L>): IDBRequest<K>;
-  openCursor(range?: L|IDBKeyRange<L>, direction?: IDBDirection): IDBRequest<IDBCursorWithValue<K, V>>;
-  openKeyCursor(range?: L|IDBKeyRange<L>, direction?: IDBDirection): IDBRequest<IDBCursor<K, V>>;
+  openCursor(range?: L|IDBKeyRange<L>, direction?: IDBDirection): IDBRequest<IDBCursorWithValue<K, L, V> | null>;
+  openKeyCursor(range?: L|IDBKeyRange<L>, direction?: IDBDirection): IDBRequest<IDBCursor<K, L, V> | null>;
   name: string;
   objectStore: IDBObjectStore<K, V>;
-  keyPath: any;
+  keyPath: string | string[] | null;
   multiEntry: bool;
   unique: bool;
 }
 
+// Theorically we'd need to have static functions with a different generic key,
+// but this doesn't make a practical difference in this case.
 declare interface IDBKeyRange<K> {
-  bound<L>(lower: L, upper: L, lowerOpen?: bool, upperOpen?: bool): IDBKeyRange<L>;
-  only<L>(value: L): IDBKeyRange<L>;
-  lowerBound<L>(bound: L, open?: bool): IDBKeyRange<L>;
-  upperBound<L>(bound: L, open?: bool): IDBKeyRange<L>;
+  bound(lower: K, upper: K, lowerOpen?: bool, upperOpen?: bool): IDBKeyRange<K>;
+  only(value: K): IDBKeyRange<K>;
+  lowerBound(bound: K, open?: bool): IDBKeyRange<K>;
+  upperBound(bound: K, open?: bool): IDBKeyRange<K>;
   lower: K;
   upper: K;
   lowerOpen: bool;
   upperOpen: bool;
 }
 
-declare interface IDBCursor<K, V> {
+declare interface IDBCursor<K, L, V> {
   advance(count: number): void;
-  continue(key?: K): void;
+  continue(key?: L): void;
+  continuePrimaryKey(key: L, primaryKey: K): void;
   delete(): IDBRequest<void>;
   update(newValue: V): IDBRequest<void>;
-  source: IDBObjectStore<K, V>|IDBIndex<K, any, V>;
+  source: IDBObjectStore<K, V>|IDBIndex<K, L, V>;
   direction: IDBDirection;
-  key: K;
-  primaryKey: any;
+  key: L;
+  primaryKey: K;
 }
-declare interface IDBCursorWithValue<K, V> extends IDBCursor<K, V> {
+declare interface IDBCursorWithValue<K, L, V> extends IDBCursor<K, L, V> {
   value: V;
 }
