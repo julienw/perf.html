@@ -10,6 +10,17 @@ export type SymbolTableAsTuple = [
   Uint8Array,  // buffer
 ];
 
+type SymbolItem = {|
+  debugName: string,
+  breakpadId: string,
+  addrs: Uint32Array,
+  index: Uint32Array,
+  buffer: Uint8Array,
+  lastUsedDate: Date,
+|};
+
+type SymbolStore = IDBObjectStore<[string, string], SymbolItem>;
+
 const kTwoWeeksInMilliseconds = 2 * 7 * 24 * 60 * 60 * 1000;
 
 /**
@@ -72,7 +83,7 @@ export class SymbolStoreDB {
         if (oldVersion === 1) {
           db.deleteObjectStore('symbol-tables');
         }
-        const store = db.createObjectStore('symbol-tables', {
+        const store: SymbolStore = db.createObjectStore('symbol-tables', {
           keyPath: ['debugName', 'breakpadId'],
         });
         store.createIndex('lastUsedDate', 'lastUsedDate');
@@ -111,7 +122,7 @@ export class SymbolStoreDB {
       return new Promise((resolve, reject) => {
         const transaction = db.transaction('symbol-tables', 'readwrite');
         transaction.onerror = () => reject(transaction.error);
-        const store = transaction.objectStore('symbol-tables');
+        const store: SymbolStore = transaction.objectStore('symbol-tables');
         this._deleteLeastRecentlyUsedUntilCountIsNoMoreThanN(store, this._maxCount - 1, () => {
           const lastUsedDate = new Date();
           const addReq = store.add({ debugName, breakpadId, addrs, index, buffer, lastUsedDate });
@@ -134,7 +145,7 @@ export class SymbolStoreDB {
       return new Promise((resolve, reject) => {
         const transaction = db.transaction('symbol-tables', 'readwrite');
         transaction.onerror = () => reject(transaction.error);
-        const store: IDBObjectStore<*, *> = transaction.objectStore('symbol-tables');
+        const store: SymbolStore = transaction.objectStore('symbol-tables');
         const req = store.openCursor([debugName, breakpadId]);
         req.onsuccess = () => {
           const cursor = req.result;
@@ -173,12 +184,12 @@ export class SymbolStoreDB {
     return new Promise((resolve, reject) => {
       const transaction = db.transaction('symbol-tables', 'readwrite');
       transaction.onerror = () => reject(transaction.error);
-      const store = transaction.objectStore('symbol-tables');
+      const store: SymbolStore = transaction.objectStore('symbol-tables');
       this._deleteRecordsLastUsedBeforeDate(store, beforeDate, resolve);
     });
   }
 
-  _deleteRecordsLastUsedBeforeDate(store: IDBObjectStore<*, *>, beforeDate: Date, callback: () => void): void {
+  _deleteRecordsLastUsedBeforeDate(store: SymbolStore, beforeDate: Date, callback: () => void): void {
     const lastUsedDateIndex = store.index('lastUsedDate');
     // Get a cursor that walks all records whose lastUsedDate is less than beforeDate.
     const cursorReq = lastUsedDateIndex.openCursor(
@@ -196,10 +207,10 @@ export class SymbolStoreDB {
     };
   }
 
-  _deleteNLeastRecentlyUsedRecords(store: IDBObjectStore<*, *>, n: number, callback: () => void): void {
+  _deleteNLeastRecentlyUsedRecords(store: SymbolStore, n: number, callback: () => void): void {
     // Get a cursor that walks the records from oldest to newest
     // lastUsedDate.
-    const lastUsedDateIndex = store.index('lastUsedDate');
+    const lastUsedDateIndex: IDBIndex<*, Date, *> = store.index('lastUsedDate');
     const cursorReq = lastUsedDateIndex.openCursor();
     let deletedCount = 0;
     cursorReq.onsuccess = () => {
@@ -220,12 +231,12 @@ export class SymbolStoreDB {
     };
   }
 
-  _count(store: IDBObjectStore<*, *>, callback: (number) => void): void {
+  _count(store: SymbolStore, callback: (number) => void): void {
     const countReq = store.count();
     countReq.onsuccess = () => callback(countReq.result);
   }
 
-  _deleteLeastRecentlyUsedUntilCountIsNoMoreThanN(store: IDBObjectStore<*, *>, n: number, callback: () => void): void {
+  _deleteLeastRecentlyUsedUntilCountIsNoMoreThanN(store: SymbolStore, n: number, callback: () => void): void {
     this._count(store, symbolTableCount => {
       if (symbolTableCount > n) {
         // We'll need to remove at least one symbol table.
