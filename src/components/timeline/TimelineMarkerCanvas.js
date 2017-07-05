@@ -47,10 +47,6 @@ class TimelineMarkerCanvas extends PureComponent {
 
   props: Props;
 
-  state: {
-    hoveredItem: null | number,
-  };
-
   constructor(props: Props) {
     super(props);
     (this: any).onDoubleClickMarker = this.onDoubleClickMarker.bind(this);

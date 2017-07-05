@@ -4,6 +4,7 @@
 
 import React, { PureComponent, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import ContextMenuTrigger from '../shared/ContextMenuTrigger';
 import TreeView from '../shared/TreeView';
 import {
   getZeroAt,
