@@ -105,14 +105,13 @@ export default class TimelineCanvas<HoveredItem> extends PureComponent<
     }
   }
 
-  _onMouseMove(event: SyntheticMouseEvent) {
+  _onMouseMove(event: SyntheticMouseEvent & { nativeEvent: MouseEvent }) {
     if (!this._canvas) {
       return;
     }
 
-    const rect = this._canvas.getBoundingClientRect();
-    const x: CssPixels = event.pageX - rect.left;
-    const y: CssPixels = event.pageY - rect.top;
+    const x: CssPixels = event.nativeEvent.offsetX;
+    const y: CssPixels = event.nativeEvent.offsetY;
 
     const maybeHoveredItem = this.props.hitTest(x, y);
     if (!hoveredItemsAreEqual(maybeHoveredItem, this.state.hoveredItem)) {
