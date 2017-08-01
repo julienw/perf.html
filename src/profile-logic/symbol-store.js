@@ -55,6 +55,7 @@ export class SymbolStore {
     const { debugName, breakpadId } = lib;
     const libid = `${debugName}/${breakpadId}`;
 
+    console.log('getSymbolTable');
     if (this._failedRequests.has(libid)) {
       return Promise.reject(
         new Error(
@@ -68,6 +69,7 @@ export class SymbolStore {
       // We've already requested a symbol table for this library and are
       // waiting for the result, so just return the promise for the existing
       // request.
+      console.log('existing request for symbol table');
       return existingRequest;
     }
 
@@ -88,6 +90,7 @@ export class SymbolStore {
         // Once the symbol table comes in, store it in the database, but don't
         // let that block the promise that we return to our caller.
         symbolTablePromise.then(symbolTable => {
+          console.log('>>>> got symbol table', typeof symbolTable);
           this._db.storeSymbolTable(debugName, breakpadId, symbolTable).then(
             () => {
               this._requestedSymbolTables.delete(libid);
@@ -107,7 +110,10 @@ export class SymbolStore {
         return symbolTablePromise;
       });
     this._requestedSymbolTables.set(libid, symbolTablePromise);
-    return symbolTablePromise;
+    return symbolTablePromise.then(result => {
+      console.log('finished getSymbolTable with result', typeof result);
+      return result;
+    });
   }
 
   /**

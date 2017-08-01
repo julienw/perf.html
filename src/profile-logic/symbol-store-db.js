@@ -71,8 +71,11 @@ export class SymbolStoreDB {
   _setupDB(dbName: string): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
       const indexedDB: IDBFactory = window.indexedDB;
+      console.log('>>> before open', dbName);
       const openReq = indexedDB.open(dbName, 2);
+      console.log('>>> after open');
       openReq.onerror = () => {
+        console.log('error', openReq.error);
         if (openReq.error.name === 'VersionError') {
           // This error fires if the database already exists, and the existing
           // database has a higher version than what we requested. So either
@@ -92,6 +95,7 @@ export class SymbolStoreDB {
         }
       };
       openReq.onupgradeneeded = ({ oldVersion }) => {
+        console.log('>>> upgrade needed');
         const db = openReq.result;
         db.onerror = reject;
 
@@ -102,9 +106,11 @@ export class SymbolStoreDB {
           keyPath: ['debugName', 'breakpadId'],
         });
         store.createIndex('lastUsedDate', 'lastUsedDate');
+        console.log('>>> finished upgrade');
       };
 
       openReq.onblocked = () => {
+        console.log('blocked');
         reject(
           new Error(
             'The symbol store database could not be upgraded because it is ' +
@@ -116,7 +122,9 @@ export class SymbolStoreDB {
 
       openReq.onsuccess = () => {
         const db = openReq.result;
+        console.log('>>> success');
         db.onversionchange = () => {
+          console.log('>>> version change');
           db.close();
         };
         resolve(db);
@@ -181,6 +189,7 @@ export class SymbolStoreDB {
     breakpadId: string
   ): Promise<SymbolTableAsTuple> {
     return this._getDB().then(db => {
+      console.log('>>> got db');
       return new Promise((resolve, reject) => {
         const transaction = db.transaction('symbol-tables', 'readwrite');
         transaction.onerror = () => reject(transaction.error);

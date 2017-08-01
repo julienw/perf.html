@@ -271,6 +271,7 @@ async function doSymbolicateProfile(
   profile: Profile,
   symbolStore: SymbolStore
 ) {
+  console.log('>>>> doSymbolicateProfile');
   dispatch(startSymbolicating());
   await symbolicateProfile(profile, symbolStore, {
     onMergeFunctions: (
@@ -291,7 +292,9 @@ async function doSymbolicateProfile(
     },
   });
 
+  console.log('>>> doSymbolicateProfile 2');
   await gCoalescedFunctionsUpdateDispatcher.scheduledUpdatesDone;
+  console.log('>>> doSymbolicateProfile 3');
 
   dispatch(doneSymbolicating());
 }
@@ -327,12 +330,15 @@ export function retrieveProfileFromAddon(): ThunkAction<Promise<void>> {
       const geckoProfiler = await window.geckoProfilerPromise;
       clearTimeout(timeoutId);
 
+      console.log('retrieveProfileFromAddon 1');
       const [profile, symbolStore] = await Promise.all([
         getProfileFromAddon(dispatch, geckoProfiler),
         getSymbolStore(dispatch, geckoProfiler),
       ]);
+      console.log('retrieveProfileFromAddon 2');
 
       await doSymbolicateProfile(dispatch, profile, symbolStore);
+      console.log('retrieveProfileFromAddon 3');
     } catch (error) {
       dispatch(fatalErrorReceivingProfileFromAddon(error));
       throw error;

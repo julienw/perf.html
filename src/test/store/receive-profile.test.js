@@ -3,6 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import sinon from 'sinon';
+import fakeIndexedDB from 'fake-indexeddb';
+import FDBKeyRange from 'fake-indexeddb/lib/FDBKeyRange';
+
 import { blankStore } from '../fixtures/stores';
 import * as ProfileViewSelectors from '../../reducers/profile-view';
 import * as URLStateSelectors from '../../reducers/url-state';
@@ -16,6 +19,7 @@ import {
 
 import preprocessedProfile from '../fixtures/profiles/profile-2d-canvas.json';
 import exampleProfile from '../fixtures/profiles/example-profile';
+import exampleSymbolTable from '../fixtures/example-symbol-table';
 
 describe('actions/receive-profile', function() {
   /**
@@ -39,6 +43,30 @@ describe('actions/receive-profile', function() {
     return states;
   }
 
+  function deleteDatabase() {
+    return new Promise((resolve, reject) => {
+      const req = fakeIndexedDB.deleteDatabase(
+        'perf-html-async-storage-symbol-tables'
+      );
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  beforeAll(function() {
+    window.indexedDB = fakeIndexedDB;
+    window.IDBKeyRange = FDBKeyRange;
+  });
+
+  afterAll(function() {
+    delete window.indexedDB;
+    delete window.IDBKeyRange;
+  });
+
+  afterEach(async function() {
+    await deleteDatabase();
+  });
+
   describe('receiveProfileFromAddon', function() {
     it('can take a profile from an addon and save it to state', function() {
       const store = blankStore();
@@ -58,11 +86,9 @@ describe('actions/receive-profile', function() {
     let clock;
 
     beforeEach(function() {
-      clock = sinon.useFakeTimers();
-
       geckoProfiler = {
         getProfile: () => Promise.resolve(exampleProfile),
-        getSymbolTable: () => Promise.resolve(),
+        getSymbolTable: () => Promise.resolve(exampleSymbolTable),
       };
       window.geckoProfilerPromise = Promise.resolve(geckoProfiler);
     });
@@ -74,7 +100,7 @@ describe('actions/receive-profile', function() {
       delete window.geckoProfilerPromise;
     });
 
-    it('can retrieve a profile from the addon', async function() {
+    it.only('can retrieve a profile from the addon', async function() {
       const store = blankStore();
       await store.dispatch(retrieveProfileFromAddon());
 
