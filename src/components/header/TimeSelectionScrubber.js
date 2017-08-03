@@ -50,7 +50,11 @@ class TimeSelectionScrubberImpl extends PureComponent {
 
     let isRangeSelecting = false;
 
+    let animationFrameRequest = null;
     const mouseMoveHandler = e => {
+      if (animationFrameRequest) {
+        return;
+      }
       const mouseMoveTime =
         (e.pageX - r.left) / r.width * (rangeEnd - rangeStart) + rangeStart;
       const selectionStart = clamp(
@@ -68,16 +72,23 @@ class TimeSelectionScrubberImpl extends PureComponent {
         selectionEnd - selectionStart >= minSelectionStartWidth
       ) {
         isRangeSelecting = true;
-        this.props.onSelectionChange({
-          hasSelection: true,
-          selectionStart,
-          selectionEnd,
-          isModifying: true,
+        animationFrameRequest = requestAnimationFrame(() => {
+          animationFrameRequest = null;
+          this.props.onSelectionChange({
+            hasSelection: true,
+            selectionStart,
+            selectionEnd,
+            isModifying: true,
+          });
         });
       }
     };
 
     const mouseUpHandler = e => {
+      if (animationFrameRequest) {
+        cancelAnimationFrame(animationFrameRequest);
+        animationFrameRequest = null;
+      }
       if (isRangeSelecting) {
         const mouseMoveTime =
           (e.pageX - r.left) / r.width * (rangeEnd - rangeStart) + rangeStart;
