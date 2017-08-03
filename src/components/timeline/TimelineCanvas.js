@@ -32,14 +32,12 @@ export default class TimelineCanvas<HoveredItem> extends PureComponent<
 > {
   props: Props<HoveredItem>;
   state: State<HoveredItem>;
-  _requestedAnimationFrame: boolean;
   _devicePixelRatio: number;
   _ctx: CanvasRenderingContext2D;
   _canvas: ?HTMLCanvasElement;
 
   constructor(props: Props<HoveredItem>) {
     super(props);
-    this._requestedAnimationFrame = false;
     this._devicePixelRatio = 1;
     this.state = {
       hoveredItem: null,
@@ -54,25 +52,16 @@ export default class TimelineCanvas<HoveredItem> extends PureComponent<
     (this: any)._getHoveredItemInfo = this._getHoveredItemInfo.bind(this);
   }
 
-  shouldComponentUpdate() {
-    // If the parent updates, always re-render.
-    return true;
-  }
-
   _scheduleDraw() {
     const { className, drawCanvas } = this.props;
-    if (!this._requestedAnimationFrame) {
-      this._requestedAnimationFrame = true;
-      window.requestAnimationFrame(() => {
-        this._requestedAnimationFrame = false;
-        if (this._canvas) {
-          timeCode(`${className} render`, () => {
-            this._prepCanvas();
-            drawCanvas(this._ctx, this.state.hoveredItem);
-          });
-        }
-      });
-    }
+    window.requestAnimationFrame(() => {
+      if (this._canvas) {
+        timeCode(`${className} render`, () => {
+          this._prepCanvas();
+          drawCanvas(this._ctx, this.state.hoveredItem);
+        });
+      }
+    });
   }
 
   _prepCanvas() {
@@ -147,10 +136,24 @@ export default class TimelineCanvas<HoveredItem> extends PureComponent<
     this._canvas = canvas;
   }
 
+  shouldComponentUpdate() {
+    // always try to update if the parent updates
+    return true;
+  }
+
+  componentDidUpdate(
+    prevProps: Props<HoveredItem>,
+    prevState: State<HoveredItem>
+  ) {
+    // We shouldn't schedule draw if we render because of a state change
+    if (prevState === this.state) {
+      this._scheduleDraw();
+    }
+  }
+
   render() {
     const { isDragging } = this.props;
     const { hoveredItem, mouseX, mouseY } = this.state;
-    this._scheduleDraw();
 
     const className = classNames({
       timelineCanvas: true,
