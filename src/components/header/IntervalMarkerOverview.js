@@ -33,18 +33,18 @@ type Props = {
   },
 };
 
+type State = {
+  hoveredItem: TracingMarker | null,
+  mouseDownItem: TracingMarker | null,
+  mouseX: CssPixels,
+  mouseY: CssPixels,
+};
+
 class IntervalMarkerOverview extends PureComponent {
   props: Props;
-
-  state: {
-    hoveredItem: TracingMarker | null,
-    mouseDownItem: TracingMarker | null,
-    mouseX: CssPixels,
-    mouseY: CssPixels,
-  };
+  state: State;
 
   _canvas: HTMLCanvasElement | null;
-  _requestedAnimationFrame: boolean | null;
 
   constructor(props: Props) {
     super(props);
@@ -67,18 +67,14 @@ class IntervalMarkerOverview extends PureComponent {
   }
 
   _scheduleDraw() {
-    if (!this._requestedAnimationFrame) {
-      this._requestedAnimationFrame = true;
-      window.requestAnimationFrame(() => {
-        this._requestedAnimationFrame = false;
-        const c = this._canvas;
-        if (c) {
-          timeCode('IntervalMarkerTimeline render', () => {
-            this.drawCanvas(c);
-          });
-        }
-      });
-    }
+    window.requestAnimationFrame(() => {
+      const c = this._canvas;
+      if (c) {
+        timeCode('IntervalMarkerTimeline render', () => {
+          this.drawCanvas(c);
+        });
+      }
+    });
   }
 
   _hitTest(e): TracingMarker | null {
@@ -162,8 +158,14 @@ class IntervalMarkerOverview extends PureComponent {
     });
   }
 
+  componentDidUpdate(prevProps: Props, prevState: State) {
+    // We shouldn't schedule draw if we render because of a state change
+    if (prevState === this.state) {
+      this._scheduleDraw();
+    }
+  }
+
   render() {
-    this._scheduleDraw();
     const { className, isSelected, isModifyingSelection } = this.props;
     const { mouseDownItem, hoveredItem, mouseX, mouseY } = this.state;
     const shouldShowTooltip = !isModifyingSelection && !mouseDownItem;

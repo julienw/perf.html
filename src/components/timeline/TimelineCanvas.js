@@ -1,8 +1,13 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ *  * License, v. 2.0. If a copy of the MPL was not distributed with this
+ *   * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 // @flow
 import React, { PureComponent } from 'react';
 import { timeCode } from '../../utils/time-code';
 import classNames from 'classnames';
 import Tooltip from '../shared/Tooltip';
+import { withIntersection } from '../shared/WithIntersection';
 
 import type { CssPixels, DevicePixels } from '../../types/units';
 
@@ -15,6 +20,7 @@ type Props<HoveredItem> = {
   drawCanvas: (CanvasRenderingContext2D, HoveredItem | null) => void,
   isDragging: boolean,
   hitTest: (x: CssPixels, y: CssPixels) => HoveredItem | null,
+  isIntersecting: boolean,
 };
 
 type State<HoveredItem> = {
@@ -25,7 +31,7 @@ type State<HoveredItem> = {
 
 require('./TimelineCanvas.css');
 
-export default class TimelineCanvas<HoveredItem> extends PureComponent<
+class TimelineCanvas<HoveredItem> extends PureComponent<
   void,
   Props<HoveredItem>,
   State<HoveredItem>
@@ -145,8 +151,9 @@ export default class TimelineCanvas<HoveredItem> extends PureComponent<
     prevProps: Props<HoveredItem>,
     prevState: State<HoveredItem>
   ) {
-    // We shouldn't schedule draw if we render because of a state change
-    if (prevState === this.state) {
+    // We shouldn't schedule draw if we render because of a state change, as
+    // state changes are only for Tooltips
+    if (this.props.isIntersecting && prevState === this.state) {
       this._scheduleDraw();
     }
   }
@@ -211,3 +218,5 @@ function hoveredItemsAreEqual(a: any, b: any) {
   }
   return a === b;
 }
+
+export default withIntersection(TimelineCanvas);
