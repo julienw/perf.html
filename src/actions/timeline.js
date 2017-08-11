@@ -6,7 +6,6 @@
 import type { Action } from '../types/store';
 import type { GetLabel } from '../profile-logic/labeling-strategies';
 import type { GetCategory } from '../profile-logic/color-categories';
-import type { ThreadIndex } from '../types/profile';
 
 export function changeFlameChartColorStrategy(
   getCategory: GetCategory
@@ -22,22 +21,6 @@ export function changeFlameChartLabelingStrategy(getLabel: GetLabel): Action {
     type: 'CHANGE_FLAME_CHART_LABELING_STRATEGY',
     getLabel,
   };
-}
-
-export function changeTimelineFlameChartExpandedThread(
-  threadIndex: ThreadIndex,
-  isExpanded: boolean
-): Action {
-  const type = 'CHANGE_TIMELINE_FLAME_CHART_EXPANDED_THREAD';
-  return { type, threadIndex, isExpanded };
-}
-
-export function changeTimelineMarkersExpandedThread(
-  threadIndex: ThreadIndex,
-  isExpanded: boolean
-): Action {
-  const type = 'CHANGE_TIMELINE_MARKERS_EXPANDED_THREAD';
-  return { type, threadIndex, isExpanded };
 }
 
 export function setHasZoomedViaMousewheel() {

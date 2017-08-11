@@ -26,7 +26,6 @@ type Props = {
   viewportNeedsUpdate: any,
   timeRange: StartEndRange,
   maxViewportHeight: number,
-  isRowExpanded: boolean,
   maximumZoom: UnitIntervalOfProfileRange,
   updateProfileSelection: UpdateProfileSelection,
   selection: ProfileSelection,
@@ -169,11 +168,6 @@ export default function withTimelineViewport<T>(
     }
 
     componentWillReceiveProps(newProps: Props) {
-      if (this.props.isRowExpanded !== newProps.isRowExpanded) {
-        this.setState(this.getDefaultState(newProps));
-        this._setSizeNextFrame();
-        return;
-      }
       if (
         this.props.selection !== newProps.selection ||
         this.props.timeRange !== newProps.timeRange
@@ -206,10 +200,6 @@ export default function withTimelineViewport<T>(
     _mouseWheelListener(event: SyntheticWheelEvent) {
       if (event.shiftKey) {
         this.zoomRangeSelection(event);
-        return;
-      }
-
-      if (!this.props.isRowExpanded) {
         return;
       }
 
@@ -279,10 +269,6 @@ export default function withTimelineViewport<T>(
     }
 
     zoomRangeSelection(event: SyntheticWheelEvent) {
-      if (!this.props.isRowExpanded) {
-        // Maybe this should only be listening when expanded.
-        return;
-      }
       if (!this.props.hasZoomedViaMousewheel) {
         this.props.setHasZoomedViaMousewheel();
       }
@@ -488,7 +474,7 @@ export default function withTimelineViewport<T>(
     }
 
     render() {
-      const { isRowExpanded, hasZoomedViaMousewheel } = this.props;
+      const { hasZoomedViaMousewheel } = this.props;
 
       const {
         containerWidth,
@@ -503,16 +489,12 @@ export default function withTimelineViewport<T>(
 
       const viewportClassName = classNames({
         timelineViewport: true,
-        expanded: isRowExpanded,
-        collapsed: !isRowExpanded,
         dragging: isDragging,
       });
 
       const shiftScrollClassName = classNames({
         timelineViewportShiftScroll: true,
-        hidden:
-          hasZoomedViaMousewheel ||
-          !(isShiftScrollHintVisible && isRowExpanded),
+        hidden: hasZoomedViaMousewheel || !isShiftScrollHintVisible,
       });
 
       return (

@@ -16,11 +16,7 @@ import {
   getCategoryColorStrategy,
   getLabelingStrategy,
 } from '../../reducers/flame-chart';
-import { getIsFlameChartExpanded } from '../../reducers/timeline-view';
 import actions from '../../actions';
-import { getImplementationName } from '../../profile-logic/labeling-strategies';
-import classNames from 'classnames';
-import ContextMenuTrigger from '../shared/ContextMenuTrigger';
 
 import type { Thread } from '../../types/profile';
 import type {
@@ -39,9 +35,8 @@ require('./TimelineFlameChart.css');
 const STACK_FRAME_HEIGHT = 16;
 const TIMELINE_ROW_HEIGHT = 34;
 
-type Props = {
+type Props = {|
   thread: Thread,
-  isRowExpanded: boolean,
   maxStackDepth: number,
   stackTimingByDepth: StackTimingByDepth,
   isSelected: boolean,
@@ -50,31 +45,16 @@ type Props = {
   interval: Milliseconds,
   getCategory: GetCategory,
   getLabel: GetLabel,
-  changeTimelineFlameChartExpandedThread: (number, boolean) => {},
   updateProfileSelection: UpdateProfileSelection,
   viewHeight: CssPixels,
   getScrollElement: () => HTMLElement,
   selection: ProfileSelection,
   threadName: string,
   processDetails: string,
-};
+|};
 
 class TimelineFlameChart extends PureComponent {
   props: Props;
-
-  constructor(props) {
-    super(props);
-    (this: any).toggleThreadCollapse = this.toggleThreadCollapse.bind(this);
-  }
-
-  toggleThreadCollapse() {
-    const {
-      changeTimelineFlameChartExpandedThread,
-      threadIndex,
-      isRowExpanded,
-    } = this.props;
-    changeTimelineFlameChartExpandedThread(threadIndex, !isRowExpanded);
-  }
 
   /**
    * Expanding view sizing strategy:
@@ -86,10 +66,8 @@ class TimelineFlameChart extends PureComponent {
    *              available space, leaving some margin to show the other rows.
    */
   getViewHeight(maxViewportHeight: number): number {
-    const { viewHeight, isRowExpanded } = this.props;
-    const exactSize = isRowExpanded
-      ? maxViewportHeight * 1.5
-      : maxViewportHeight;
+    const { viewHeight } = this.props;
+    const exactSize = maxViewportHeight * 1.5;
     const largeGraph = viewHeight - TIMELINE_ROW_HEIGHT * 2;
     const smallGraph = TIMELINE_ROW_HEIGHT;
     return Math.max(smallGraph, Math.min(exactSize, largeGraph));
@@ -106,7 +84,6 @@ class TimelineFlameChart extends PureComponent {
   render() {
     const {
       thread,
-      isRowExpanded,
       maxStackDepth,
       stackTimingByDepth,
       isSelected,
@@ -117,8 +94,6 @@ class TimelineFlameChart extends PureComponent {
       getLabel,
       updateProfileSelection,
       selection,
-      threadName,
-      processDetails,
       getScrollElement,
     } = this.props;
 
@@ -126,31 +101,12 @@ class TimelineFlameChart extends PureComponent {
     // that here at the top level component.
     const maxViewportHeight = maxStackDepth * STACK_FRAME_HEIGHT;
     const height = this.getViewHeight(maxViewportHeight);
-    const buttonClass = classNames('timelineFlameChartCollapseButton', {
-      expanded: isRowExpanded,
-      collapsed: !isRowExpanded,
-    });
 
     return (
       <div className="timelineFlameChart" style={{ height }}>
-        {/**
-          * The timeline will eventually have its own context menu, but for now re-use
-          * the one in the header for hiding threads.
-          */}
-        <ContextMenuTrigger
-          id={'ProfileThreadHeaderContextMenu'}
-          title={processDetails}
-          attributes={{ className: 'timelineFlameChartLabels grippy' }}
-        >
-          <span>
-            {threadName}
-          </span>
-          <button className={buttonClass} onClick={this.toggleThreadCollapse} />
-        </ContextMenuTrigger>
         <FlameChartCanvas
           key={threadIndex}
           // TimelineViewport props
-          isRowExpanded={isRowExpanded}
           isSelected={isSelected}
           timeRange={timeRange}
           maxViewportHeight={maxViewportHeight}
@@ -178,29 +134,21 @@ class TimelineFlameChart extends PureComponent {
 export default connect((state, ownProps) => {
   const { threadIndex } = ownProps;
   const threadSelectors = selectorsForThread(threadIndex);
-  const isRowExpanded = getIsFlameChartExpanded(state, threadIndex);
-  const stackTimingByDepth = isRowExpanded
-    ? threadSelectors.getStackTimingByDepthForFlameChart(state)
-    : threadSelectors.getLeafCategoryStackTimingForFlameChart(state);
+  const stackTimingByDepth = threadSelectors.getStackTimingByDepthForFlameChart(
+    state
+  );
 
   return {
     thread: threadSelectors.getFilteredThreadForFlameChart(state),
-    isRowExpanded,
-    maxStackDepth: isRowExpanded
-      ? threadSelectors.getCallNodeMaxDepthForFlameChart(state)
-      : 1,
+    maxStackDepth: threadSelectors.getCallNodeMaxDepthForFlameChart(state),
     stackTimingByDepth,
     isSelected: true,
     timeRange: getDisplayRange(state),
     interval: getProfileInterval(state),
     getCategory: getCategoryColorStrategy(state),
-    getLabel: isRowExpanded
-      ? getLabelingStrategy(state)
-      : getImplementationName,
+    getLabel: getLabelingStrategy(state),
     threadIndex,
     selection: getProfileViewOptions(state).selection,
-    threadName: threadSelectors.getFriendlyThreadName(state),
-    processDetails: threadSelectors.getThreadProcessDetails(state),
   };
 }, (actions: Object))(TimelineFlameChart);
 

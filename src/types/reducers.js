@@ -94,10 +94,7 @@ export type FlameChartState = {
   labelingStrategy: GetLabel,
 };
 
-export type IsThreadExpandedMap = Map<ThreadIndex, boolean>;
 export type TimelineViewState = {
-  isFlameChartExpanded: IsThreadExpandedMap,
-  areMarkersExpanded: IsThreadExpandedMap,
   hasZoomedViaMousewheel: boolean,
 };
 

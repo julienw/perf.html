@@ -51,6 +51,7 @@
     "pretty-bytes": "^4.0.2",
     "prop-types": "^15.5.10",
     "query-string": "^4.2.3",
+    "rc-collapse": "^1.7.6",
     "react": "^15.6.1",
     "react-addons-perf": "^15.4.2",
     "react-contextmenu": "^2.6.3",

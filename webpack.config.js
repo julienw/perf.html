@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const OfflinePlugin = require('offline-plugin');
 const includes = [path.join(__dirname, 'src'), path.join(__dirname, 'res')];
 
-const es6modules = ['pretty-bytes'];
+const es6modules = ['pretty-bytes', 'rc-collapse'];
 const es6modulePaths = es6modules.map(module => {
   return path.join(__dirname, 'node_modules', module);
 });
@@ -51,7 +51,7 @@ const baseConfig = {
       {
         test: /\.css?$/,
         loaders: ['style-loader', 'css-loader?minimize'],
-        include: includes,
+        include: includes.concat(es6modulePaths),
       },
       {
         test: /\.jpg$/,
