@@ -48,29 +48,22 @@ class TimlineViewTimelinesImpl extends PureComponent {
     const { threadIndex, threadName, height } = this.props;
 
     return (
-      <div className="timelineViewTimelines">
-        <div
-          className="timelineViewTimelinesScroller"
-          ref={this._setScrollElementRef}
-        >
-          <Collapse accordion={true}>
-            <Panel header={`Sample based callstacks (${threadName})`}>
-              <TimelineFlameChart
-                threadIndex={threadIndex}
-                viewHeight={height}
-                getScrollElement={this._getScrollElement}
-              />
-            </Panel>
-            <Panel header={`Marker Events (${threadName})`}>
-              <TimelineMarkers
-                threadIndex={threadIndex}
-                viewHeight={height}
-                getScrollElement={this._getScrollElement}
-              />
-            </Panel>
-          </Collapse>
-        </div>
-      </div>
+      <Collapse accordion={true}>
+        <Panel header={`Sample based callstacks (${threadName})`}>
+          <TimelineFlameChart
+            threadIndex={threadIndex}
+            viewHeight={height}
+            getScrollElement={this._getScrollElement}
+          />
+        </Panel>
+        <Panel header={`Marker Events (${threadName})`}>
+          <TimelineMarkers
+            threadIndex={threadIndex}
+            viewHeight={height}
+            getScrollElement={this._getScrollElement}
+          />
+        </Panel>
+      </Collapse>
     );
   }
 }
