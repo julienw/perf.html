@@ -70,7 +70,19 @@ type ProfileSharingCompositeButtonProps = {
   onProfilePublished: typeof actions.profilePublished,
 };
 
-class ProfileSharingCompositeButton extends PureComponent {
+type ProfileSharingCompositeButtonState = {
+  state: string,
+  uploadProgress: number,
+  hash: string,
+  error: Error | null,
+  fullUrl: string,
+  shortUrl: string,
+};
+
+class ProfileSharingCompositeButton extends PureComponent<
+  ProfileSharingCompositeButtonProps,
+  ProfileSharingCompositeButtonState
+> {
   props: ProfileSharingCompositeButtonProps;
   _permalinkButton: ButtonWithPanel;
   _uploadErrorButton: ButtonWithPanel;
@@ -78,14 +90,6 @@ class ProfileSharingCompositeButton extends PureComponent {
   _permalinkButtonCreated: ButtonWithPanel => void;
   _uploadErrorButtonCreated: ButtonWithPanel => void;
   _permalinkTextFieldCreated: HTMLInputElement => void;
-  state: {
-    state: string,
-    uploadProgress: number,
-    hash: string,
-    error: Error | null,
-    fullUrl: string,
-    shortUrl: string,
-  };
 
   constructor(props: ProfileSharingCompositeButtonProps) {
     super(props);
@@ -304,15 +308,18 @@ type ProfileDownloadButtonProps = {
   rootRange: StartEndRange,
 };
 
-class ProfileDownloadButton extends PureComponent {
-  props: ProfileDownloadButtonProps;
-  state: {|
-    uncompressedBlobUrl: string,
-    compressedBlobUrl: string,
-    uncompressedSize: number,
-    compressedSize: number,
-    filename: string,
-  |};
+type ProfileDownloadButtonState = {|
+  uncompressedBlobUrl: string,
+  compressedBlobUrl: string,
+  uncompressedSize: number,
+  compressedSize: number,
+  filename: string,
+|};
+
+class ProfileDownloadButton extends PureComponent<
+  ProfileDownloadButtonProps,
+  ProfileDownloadButtonState
+> {
   constructor(props: ProfileDownloadButtonProps) {
     super(props);
     this.state = {

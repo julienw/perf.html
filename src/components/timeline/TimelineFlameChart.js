@@ -59,9 +59,7 @@ type Props = {
   processDetails: string,
 };
 
-class TimelineFlameChart extends PureComponent {
-  props: Props;
-
+class TimelineFlameChart extends PureComponent<Props> {
   constructor(props) {
     super(props);
     (this: any).toggleThreadCollapse = this.toggleThreadCollapse.bind(this);

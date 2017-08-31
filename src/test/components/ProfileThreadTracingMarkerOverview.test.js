@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // @flow
-import React from 'react';
+import * as React from 'react';
 import ProfileThreadTrackingMarkerOverview from '../../components/header/ProfileThreadTracingMarkerOverview';
 import renderer from 'react-test-renderer';
 import { Provider } from 'react-redux';
@@ -14,9 +14,12 @@ import ReactDOM from 'react-dom';
 import { getBoundingBox } from '../fixtures/utils';
 
 jest.useFakeTimers();
-ReactDOM.findDOMNode = jest.fn(() => ({
-  getBoundingClientRect: () => getBoundingBox(200, 300),
-}));
+ReactDOM.findDOMNode = jest.fn(
+  () =>
+    ({
+      getBoundingClientRect: () => getBoundingBox(200, 300),
+    }: any) // Flow wants a real Element here...
+);
 
 it('renders ProfileThreadTracingMarkerOverview correctly', () => {
   // Tie the requestAnimationFrame into jest's fake timers.

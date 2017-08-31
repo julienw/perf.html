@@ -4,7 +4,9 @@
 
 // @flow
 
-import React, { PureComponent, PropTypes } from 'react';
+import * as React from 'react';
+const { PureComponent } = React;
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import VirtualList from './VirtualList';
 import { BackgroundImageStyleDef } from './StyleDef';
@@ -18,7 +20,7 @@ import type { IconWithClassName } from '../../types/reducers';
 export type Column = {
   propName: string,
   title: string,
-  component?: ReactClass<*>,
+  component?: React.ComponentType<*>,
 };
 
 type TreeViewHeaderProps = {
@@ -81,9 +83,9 @@ type TreeViewRowFixedColumnsProps = {
   highlightString: string,
 };
 
-class TreeViewRowFixedColumns extends PureComponent {
-  props: TreeViewRowFixedColumnsProps;
-
+class TreeViewRowFixedColumns extends PureComponent<
+  TreeViewRowFixedColumnsProps
+> {
   constructor(props: TreeViewRowFixedColumnsProps) {
     super(props);
     (this: any)._onClick = this._onClick.bind(this);
@@ -147,9 +149,9 @@ type TreeViewRowScrolledColumnsProps = {
   highlightString: string,
 };
 
-class TreeViewRowScrolledColumns extends PureComponent {
-  props: TreeViewRowScrolledColumnsProps;
-
+class TreeViewRowScrolledColumns extends PureComponent<
+  TreeViewRowScrolledColumnsProps
+> {
   constructor(props: TreeViewRowScrolledColumnsProps) {
     super(props);
     (this: any)._onClick = this._onClick.bind(this);
@@ -257,7 +259,7 @@ type TreeViewProps = {
   appendageButtons: string[],
   disableOverscan: boolean,
   icons: IconWithClassName[],
-  contextMenu?: React$Element<*>,
+  contextMenu?: React.Element<any>,
   contextMenuId?: string,
   onAppendageButtonClick:
     | ((IndexIntoCallNodeTable | null, string) => mixed)
@@ -265,8 +267,7 @@ type TreeViewProps = {
   onSelectionChange: IndexIntoCallNodeTable => mixed,
 };
 
-class TreeView extends PureComponent {
-  props: TreeViewProps;
+class TreeView extends PureComponent<TreeViewProps> {
   _specialItems: (IndexIntoCallNodeTable | null)[];
   _visibleRows: IndexIntoCallNodeTable[];
   _list: VirtualList | null;

@@ -25,9 +25,7 @@ type Props = {
   changeCallTreeSearchString: string => void,
 };
 
-class ProfileCallTreeSettings extends PureComponent {
-  props: Props;
-
+class ProfileCallTreeSettings extends PureComponent<Props> {
   constructor(props: Props) {
     super(props);
     (this: any)._onImplementationFilterChange = this._onImplementationFilterChange.bind(

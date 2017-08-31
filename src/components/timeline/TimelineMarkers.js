@@ -58,9 +58,7 @@ type Props = {
   markers: TracingMarker[],
 };
 
-class TimelineMarkers extends PureComponent {
-  props: Props;
-
+class TimelineMarkers extends PureComponent<Props> {
   constructor(props) {
     super(props);
     (this: any)._toggleThreadCollapse = this._toggleThreadCollapse.bind(this);
