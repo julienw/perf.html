@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // @flow
-import React, { PureComponent } from 'react';
+import * as React from 'react';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { getHasZoomedViaMousewheel } from '../../reducers/timeline-view';
@@ -16,6 +16,8 @@ import type {
 } from '../../types/units';
 import type { UpdateProfileSelection } from '../../actions/profile-view';
 import type { ProfileSelection } from '../../types/actions';
+
+require('./TimelineViewport.css');
 
 const { DOM_DELTA_PAGE, DOM_DELTA_LINE } =
   typeof window === 'object' && window.WheelEvent
@@ -36,7 +38,19 @@ type Props = {
   hasZoomedViaMousewheel: boolean,
 };
 
-require('./TimelineViewport.css');
+type State = {
+  containerWidth: CssPixels,
+  containerHeight: CssPixels,
+  containerLeft: CssPixels,
+  viewportTop: CssPixels,
+  viewportBottom: CssPixels,
+  viewportLeft: UnitIntervalOfProfileRange,
+  viewportRight: UnitIntervalOfProfileRange,
+  dragX: CssPixels,
+  dragY: CssPixels,
+  isDragging: boolean,
+  isShiftScrollHintVisible: boolean,
+};
 
 // This is a little hacky, but saves from having to dynamically look up some properties.
 const COLLAPSED_ROW_HEIGHT = 34;
@@ -68,29 +82,14 @@ const COLLAPSED_ROW_HEIGHT = 34;
  * viewportRight += mouseMoveDelta * unitPixel
  * viewportLeft += mouseMoveDelta * unitPixel
  **/
-export default function withTimelineViewport<T>(
-  WrappedComponent: ReactClass<T>
-) {
-  class TimelineViewport extends PureComponent {
-    props: Props;
+export default function withTimelineViewport<T: {}>(
+  WrappedComponent: React.ComponentType<T>
+): React.ComponentType<any> {
+  class TimelineViewport extends React.PureComponent<Props, State> {
     shiftScrollId: number;
     zoomRangeSelectionScheduled: boolean;
     zoomRangeSelectionScrollDelta: number;
     _container: ?HTMLElement;
-
-    state: {
-      containerWidth: CssPixels,
-      containerHeight: CssPixels,
-      containerLeft: CssPixels,
-      viewportTop: CssPixels,
-      viewportBottom: CssPixels,
-      viewportLeft: UnitIntervalOfProfileRange,
-      viewportRight: UnitIntervalOfProfileRange,
-      dragX: CssPixels,
-      dragY: CssPixels,
-      isDragging: boolean,
-      isShiftScrollHintVisible: boolean,
-    };
 
     constructor(props: Props) {
       super(props);
@@ -203,7 +202,7 @@ export default function withTimelineViewport<T>(
       requestAnimationFrame(this._setSize);
     }
 
-    _mouseWheelListener(event: SyntheticWheelEvent) {
+    _mouseWheelListener(event: SyntheticWheelEvent<>) {
       if (event.shiftKey) {
         this.zoomRangeSelection(event);
         return;
@@ -232,7 +231,7 @@ export default function withTimelineViewport<T>(
       }
     }
 
-    isViewportOccluded(event: SyntheticWheelEvent): boolean {
+    isViewportOccluded(event: SyntheticWheelEvent<>): boolean {
       const scrollElement = this.props.getScrollElement();
       const container = this._container;
       if (!scrollElement || !container) {
@@ -278,7 +277,7 @@ export default function withTimelineViewport<T>(
       return viewportRect.bottom > scrollRect.bottom - minimumGap;
     }
 
-    zoomRangeSelection(event: SyntheticWheelEvent) {
+    zoomRangeSelection(event: SyntheticWheelEvent<>) {
       if (!this.props.isRowExpanded) {
         // Maybe this should only be listening when expanded.
         return;
@@ -364,7 +363,7 @@ export default function withTimelineViewport<T>(
       }
     }
 
-    _mouseDownListener(event: SyntheticMouseEvent) {
+    _mouseDownListener(event: SyntheticMouseEvent<>) {
       this.setState({
         dragX: event.clientX,
         dragY: event.clientY,
@@ -564,7 +563,7 @@ const SCROLL_LINE_SIZE = 15;
  * into CssPixels. https://developer.mozilla.org/en-US/docs/Web/API/WheelEvent/deltaMode
  */
 function getNormalizedScrollDelta(
-  event: SyntheticWheelEvent,
+  event: SyntheticWheelEvent<>,
   pageHeight: number,
   key: 'deltaY' | 'deltaX'
 ): CssPixels {

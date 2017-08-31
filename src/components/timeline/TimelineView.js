@@ -27,10 +27,8 @@ type Props = {
   changeThreadOrder: typeof changeThreadOrder,
 };
 
-class TimlineViewTimelinesImpl extends PureComponent {
-  props: Props;
-
-  _scrollElement: ?HTMLElement;
+class TimlineViewTimelinesImpl extends PureComponent<Props> {
+  _scrollElement: HTMLElement | null;
 
   constructor(props: Props) {
     super(props);
@@ -42,7 +40,7 @@ class TimlineViewTimelinesImpl extends PureComponent {
     return this._scrollElement;
   }
 
-  _setScrollElementRef(element: HTMLElement) {
+  _setScrollElementRef(element: HTMLElement | null) {
     this._scrollElement = element;
   }
 
@@ -115,14 +113,14 @@ class TimlineViewTimelinesImpl extends PureComponent {
 
 const TimelineViewTimelines = withSize(TimlineViewTimelinesImpl);
 
-class TimelineView extends PureComponent {
-  props: {
-    threads: Thread[],
-    threadOrder: ThreadIndex[],
-    hiddenThreads: ThreadIndex[],
-    changeThreadOrder: typeof changeThreadOrder,
-  };
+type TimelineViewProps = {
+  threads: Thread[],
+  threadOrder: ThreadIndex[],
+  hiddenThreads: ThreadIndex[],
+  changeThreadOrder: typeof changeThreadOrder,
+};
 
+class TimelineView extends PureComponent<TimelineViewProps> {
   render() {
     const {
       threads,

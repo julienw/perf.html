@@ -51,9 +51,7 @@ type Props = {|
   changeSelectedThread: typeof changeSelectedThread,
 |};
 
-class ProfileViewerHeader extends PureComponent {
-  props: Props;
-
+class ProfileViewerHeader extends PureComponent<Props> {
   constructor(props: Props) {
     super(props);
     (this: any)._onZoomButtonClick = this._onZoomButtonClick.bind(this);

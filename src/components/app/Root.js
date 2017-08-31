@@ -75,9 +75,7 @@ type ProfileViewProps = {
   retrieveProfileFromUrl: typeof retrieveProfileFromUrl,
 };
 
-class ProfileViewWhenReadyImpl extends PureComponent {
-  props: ProfileViewProps;
-
+class ProfileViewWhenReadyImpl extends PureComponent<ProfileViewProps> {
   componentDidMount() {
     const {
       dataSource,
@@ -209,9 +207,7 @@ type RootProps = {
   store: Store,
 };
 
-export default class Root extends PureComponent {
-  props: RootProps;
-
+export default class Root extends PureComponent<RootProps> {
   render() {
     const { store } = this.props;
     return (

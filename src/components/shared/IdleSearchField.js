@@ -16,19 +16,17 @@ type Props = {
   title: ?string,
 };
 
-class IdleSearchField extends PureComponent {
+type State = {
+  value: string,
+};
+
+class IdleSearchField extends PureComponent<Props, State> {
   _onSearchFieldChange: Event => void;
   _onSearchFieldFocus: Event => void;
   _onClearButtonClick: Event => void;
   _onTimeout: void => void;
   _timeout: number;
   _previouslyNotifiedValue: string;
-
-  props: Props;
-
-  state: {
-    value: string,
-  };
 
   constructor(props: Props) {
     super(props);

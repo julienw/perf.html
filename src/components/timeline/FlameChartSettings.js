@@ -25,9 +25,7 @@ type Props = {
   changeCallTreeSearchString: string => void,
 };
 
-class FlameChartSettings extends PureComponent {
-  props: Props;
-
+class FlameChartSettings extends PureComponent<Props> {
   constructor(props) {
     super(props);
     (this: any)._onHidePlatformDetailsClick = this._onHidePlatformDetailsClick.bind(

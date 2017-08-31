@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // @flow
-import React from 'react';
+import * as React from 'react';
 import ProfileViewerHeader from '../../components/header/ProfileViewerHeader';
 import renderer from 'react-test-renderer';
 import { Provider } from 'react-redux';
@@ -14,9 +14,12 @@ import { getBoundingBox } from '../fixtures/utils';
 import ReactDOM from 'react-dom';
 
 jest.useFakeTimers();
-ReactDOM.findDOMNode = jest.fn(() => ({
-  getBoundingClientRect: () => getBoundingBox(300, 300),
-}));
+ReactDOM.findDOMNode = jest.fn(
+  () =>
+    ({
+      getBoundingClientRect: () => getBoundingBox(300, 300),
+    }: any) // Flow wants a real Element here...
+);
 
 describe('calltree/ProfileViewerHeader', function() {
   it('renders the header', () => {

@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // @flow
-import React, { PureComponent } from 'react';
+import * as React from 'react';
 import withTimelineViewport from './TimelineViewport';
 import TimelineCanvas from './TimelineCanvas';
 import MarkerTooltipContents from '../shared/MarkerTooltipContents';
@@ -38,6 +38,10 @@ type Props = {
   isDragging: boolean,
 };
 
+type State = {
+  hoveredItem: null | number,
+};
+
 const ROW_HEIGHT = 16;
 const TEXT_OFFSET_TOP = 11;
 const TWO_PI = Math.PI * 2;
@@ -45,17 +49,11 @@ const MARKER_DOT_RADIUS = 0.25;
 const TEXT_OFFSET_START = 3;
 const MARKER_LABEL_MAX_LENGTH = 30;
 
-class TimelineMarkerCanvas extends PureComponent {
+class TimelineMarkerCanvas extends React.PureComponent<Props, State> {
   _requestedAnimationFrame: boolean;
   _devicePixelRatio: number;
   _ctx: null | CanvasRenderingContext2D;
   _textMeasurement: null | TextMeasurement;
-
-  props: Props;
-
-  state: {
-    hoveredItem: null | number,
-  };
 
   constructor(props: Props) {
     super(props);
@@ -307,7 +305,7 @@ class TimelineMarkerCanvas extends PureComponent {
     ctx.fillRect(x + c, bottom - c, width - 2 * c, c);
   }
 
-  getHoveredMarkerInfo(hoveredItem: IndexIntoMarkerTiming): React$Element<*> {
+  getHoveredMarkerInfo(hoveredItem: IndexIntoMarkerTiming): React.Element<any> {
     const marker = this.props.markers[hoveredItem];
     return <MarkerTooltipContents marker={marker} />;
   }

@@ -4,7 +4,7 @@
 
 // @flow
 
-import React, { PureComponent } from 'react';
+import * as React from 'react';
 import classNames from 'classnames';
 
 require('./ButtonWithPanel.css');
@@ -17,26 +17,27 @@ interface Panel {
   open(): mixed,
 }
 
-type Props = {
+type Props<P> = {
   className: string,
   label: string,
-  panel: React$Element<*>, // Ideally we'd like to say that panel implements Panel, but I can't express it with Flow
+  panel: P,
   open?: boolean,
 };
 
-class ButtonWithPanel extends PureComponent {
-  props: Props;
-  state: {|
-    open: boolean,
-  |};
+type State = {|
+  open: boolean,
+|};
 
-  _panel: Panel | null;
+class ButtonWithPanel<
+  P: React.Element<any> & Panel
+> extends React.PureComponent<Props<P>, State> {
+  _panel: P | null;
 
   _onPanelOpen: () => void;
   _onPanelClose: () => void;
-  _panelCreated: Panel => void;
+  _panelCreated: (P | null) => void;
 
-  constructor(props: Props) {
+  constructor(props: Props<P>) {
     super(props);
     this.state = { open: !!props.open };
     this._onPanelOpen = () => {
@@ -52,12 +53,12 @@ class ButtonWithPanel extends PureComponent {
       }
     };
     (this: any)._onButtonClick = this._onButtonClick.bind(this);
-    this._panelCreated = (panel: Panel) => {
+    this._panelCreated = (panel: P | null) => {
       this._panel = panel;
     };
   }
 
-  componentWillReceiveProps(props: Props) {
+  componentWillReceiveProps(props: Props<P>) {
     if (props.open !== this.props.open) {
       this.setState({ open: !!props.open });
     }

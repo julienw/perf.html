@@ -47,9 +47,7 @@ const ProfileSharing = ({
   />;
 */
 
-class ProfileSharing extends PureComponent {
-  props: ProfileSharingProps;
-
+class ProfileSharing extends PureComponent<ProfileSharingProps> {
   render() {
     return <div className="profileSharing" {...this.props} />;
   }
