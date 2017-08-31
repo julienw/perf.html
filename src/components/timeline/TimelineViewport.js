@@ -7,7 +7,7 @@ import * as React from 'react';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { getHasZoomedViaMousewheel } from '../../reducers/timeline-view';
-import actions from '../../actions';
+import { setHasZoomedViaMousewheel } from '../../actions/timeline';
 
 import type {
   CssPixels,
@@ -24,7 +24,7 @@ const { DOM_DELTA_PAGE, DOM_DELTA_LINE } =
     ? new WheelEvent('mouse')
     : { DOM_DELTA_LINE: 1, DOM_DELTA_PAGE: 2 };
 
-type Props = {
+type ViewportProps = {
   viewportNeedsUpdate: any,
   timeRange: StartEndRange,
   maxViewportHeight: number,
@@ -33,9 +33,18 @@ type Props = {
   updateProfileSelection: UpdateProfileSelection,
   selection: ProfileSelection,
   getScrollElement: () => ?HTMLElement,
-  hasZoomedViaMousewheel: () => void,
   setHasZoomedViaMousewheel: () => void,
   hasZoomedViaMousewheel: boolean,
+};
+
+type InjectedProps = {
+  containerWidth: CssPixels,
+  containerHeight: CssPixels,
+  viewportLeft: UnitIntervalOfProfileRange,
+  viewportRight: UnitIntervalOfProfileRange,
+  viewportTop: CssPixels,
+  viewportBottom: CssPixels,
+  isDragging: boolean,
 };
 
 type State = {
@@ -82,16 +91,16 @@ const COLLAPSED_ROW_HEIGHT = 34;
  * viewportRight += mouseMoveDelta * unitPixel
  * viewportLeft += mouseMoveDelta * unitPixel
  **/
-export default function withTimelineViewport<T: {}>(
-  WrappedComponent: React.ComponentType<T>
-): React.ComponentType<any> {
-  class TimelineViewport extends React.PureComponent<Props, State> {
+export default function withTimelineViewport<InputProps: ViewportProps>(
+  WrappedComponent: React.ComponentType<InjectedProps & InputProps>
+): React.ComponentType<InputProps> {
+  class TimelineViewport extends React.PureComponent<ViewportProps, State> {
     shiftScrollId: number;
     zoomRangeSelectionScheduled: boolean;
     zoomRangeSelectionScrollDelta: number;
     _container: ?HTMLElement;
 
-    constructor(props: Props) {
+    constructor(props: ViewportProps) {
       super(props);
       (this: any)._mouseWheelListener = this._mouseWheelListener.bind(this);
       (this: any)._mouseDownListener = this._mouseDownListener.bind(this);
@@ -108,7 +117,7 @@ export default function withTimelineViewport<T: {}>(
       this.state = this.getDefaultState(props);
     }
 
-    getHorizontalViewport({ selection, timeRange }: Props) {
+    getHorizontalViewport({ selection, timeRange }: ViewportProps) {
       if (selection.hasSelection) {
         const { selectionStart, selectionEnd } = selection;
         const timeRangeLength = timeRange.end - timeRange.start;
@@ -123,7 +132,7 @@ export default function withTimelineViewport<T: {}>(
       };
     }
 
-    getDefaultState(props: Props) {
+    getDefaultState(props: ViewportProps) {
       const { viewportLeft, viewportRight } = this.getHorizontalViewport(props);
       return {
         containerWidth: 0,
@@ -160,14 +169,14 @@ export default function withTimelineViewport<T: {}>(
       }, 1000);
     }
 
-    componentDidUpdate(prevProps: Props) {
+    componentDidUpdate(prevProps: ViewportProps) {
       if (this.props.viewportNeedsUpdate(prevProps, this.props)) {
         this.setState(this.getDefaultState(this.props));
         this._setSizeNextFrame();
       }
     }
 
-    componentWillReceiveProps(newProps: Props) {
+    componentWillReceiveProps(newProps: ViewportProps) {
       if (this.props.isRowExpanded !== newProps.isRowExpanded) {
         this.setState(this.getDefaultState(newProps));
         this._setSizeNextFrame();
@@ -524,6 +533,7 @@ export default function withTimelineViewport<T: {}>(
           }}
         >
           <WrappedComponent
+            {...this.props}
             containerWidth={containerWidth}
             containerHeight={containerHeight}
             viewportLeft={viewportLeft}
@@ -531,7 +541,6 @@ export default function withTimelineViewport<T: {}>(
             viewportTop={viewportTop}
             viewportBottom={viewportBottom}
             isDragging={isDragging}
-            {...this.props}
           />
           <div className={shiftScrollClassName}>
             Zoom Timeline:
@@ -545,11 +554,12 @@ export default function withTimelineViewport<T: {}>(
 
   // Connect this component so that it knows whether or not to nag the user to use shift
   // for zooming on range selections.
-  return connect(state => {
-    return {
+  return connect(
+    state => ({
       hasZoomedViaMousewheel: getHasZoomedViaMousewheel(state),
-    };
-  }, (actions: Object))(TimelineViewport);
+    }),
+    { setHasZoomedViaMousewheel }
+  )(TimelineViewport);
 }
 
 function clamp(min, max, value) {
