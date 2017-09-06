@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 // @flow
 
-import type { IDBFactory } from '../../src/types/indexeddb';
+import type { IDBFactory, IDBKeyRange } from '../../src/types/indexeddb';
 
 type Lib = { debugName: string };
 
