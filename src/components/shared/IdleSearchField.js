@@ -41,11 +41,11 @@ class IdleSearchField extends PureComponent<Props, State> {
     this._previouslyNotifiedValue = this.state.value;
   }
 
-  _onSearchFieldFocus(e: Event & { currentTarget: HTMLInputElement }) {
+  _onSearchFieldFocus(e: SyntheticFocusEvent<HTMLInputElement>) {
     e.currentTarget.select();
   }
 
-  _onSearchFieldChange(e: Event & { currentTarget: HTMLInputElement }) {
+  _onSearchFieldChange(e: SyntheticEvent<HTMLInputElement>) {
     this.setState({
       value: e.currentTarget.value,
     });
@@ -74,7 +74,7 @@ class IdleSearchField extends PureComponent<Props, State> {
   }
 
   _onClearButtonFocus(
-    e: Event & { relatedTarget: HTMLElement, currentTarget: HTMLElement }
+    e: SyntheticEvent<HTMLElement> & { relatedTarget: HTMLElement }
   ) {
     // prevent the focus on the clear button
     if (e.relatedTarget) {
