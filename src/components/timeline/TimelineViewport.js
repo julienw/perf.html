@@ -91,16 +91,16 @@ const COLLAPSED_ROW_HEIGHT = 34;
  * viewportRight += mouseMoveDelta * unitPixel
  * viewportLeft += mouseMoveDelta * unitPixel
  **/
-export default function withTimelineViewport<InputProps: ViewportProps>(
-  WrappedComponent: React.ComponentType<InjectedProps & InputProps>
-): React.ComponentType<InputProps> {
-  class TimelineViewport extends React.PureComponent<ViewportProps, State> {
+export default function withTimelineViewport<Props: ViewportProps>(
+  WrappedComponent: React.ComponentType<InjectedProps & $Supertype<Props>>
+): React.ComponentType<Props> {
+  class TimelineViewport extends React.PureComponent<Props, State> {
     shiftScrollId: number;
     zoomRangeSelectionScheduled: boolean;
     zoomRangeSelectionScrollDelta: number;
     _container: ?HTMLElement;
 
-    constructor(props: ViewportProps) {
+    constructor(props: Props) {
       super(props);
       (this: any)._mouseWheelListener = this._mouseWheelListener.bind(this);
       (this: any)._mouseDownListener = this._mouseDownListener.bind(this);
@@ -117,7 +117,7 @@ export default function withTimelineViewport<InputProps: ViewportProps>(
       this.state = this.getDefaultState(props);
     }
 
-    getHorizontalViewport({ selection, timeRange }: ViewportProps) {
+    getHorizontalViewport({ selection, timeRange }: Props) {
       if (selection.hasSelection) {
         const { selectionStart, selectionEnd } = selection;
         const timeRangeLength = timeRange.end - timeRange.start;
@@ -132,7 +132,7 @@ export default function withTimelineViewport<InputProps: ViewportProps>(
       };
     }
 
-    getDefaultState(props: ViewportProps) {
+    getDefaultState(props: Props) {
       const { viewportLeft, viewportRight } = this.getHorizontalViewport(props);
       return {
         containerWidth: 0,
