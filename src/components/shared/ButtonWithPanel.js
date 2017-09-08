@@ -11,8 +11,8 @@ require('./ButtonWithPanel.css');
 
 interface Panel {
   props: {
-    onOpen: () => mixed,
-    onClose: () => mixed,
+    onOpen?: () => mixed,
+    onClose?: () => mixed,
   },
   open(): mixed,
 }
