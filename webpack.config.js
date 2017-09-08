@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const OfflinePlugin = require('offline-plugin');
 const includes = [path.join(__dirname, 'src'), path.join(__dirname, 'res')];
 
@@ -24,6 +25,10 @@ const basePlugins = [
     },
   }),
   new webpack.optimize.ModuleConcatenationPlugin(),
+  new ExtractTextPlugin({
+    filename: 'styles.css',
+    disable: process.env.NODE_ENV === 'development',
+  }),
 ];
 
 const baseConfig = {
@@ -50,7 +55,10 @@ const baseConfig = {
       },
       {
         test: /\.css?$/,
-        loaders: ['style-loader', 'css-loader?minimize'],
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: 'css-loader',
+        }),
         include: includes,
       },
       {
