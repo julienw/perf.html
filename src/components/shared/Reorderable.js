@@ -19,7 +19,7 @@ type Props = {|
   className: string,
   order: number[],
   onChangeOrder: (number[]) => Action,
-  children?: React.ChildrenArray<React.Element<any>>,
+  children: React.ChildrenArray<React.Element<any>>,
 |};
 
 type State = {|
@@ -228,12 +228,8 @@ class Reorderable extends React.PureComponent<Props, State> {
 
   render() {
     const { className, order } = this.props;
-    const children: Array<React.Element<any>> = React.Children.toArray(
-      this.props.children
-    );
-    const orderedChildren: Array<React.Element<any>> = order.map(
-      childIndex => children[childIndex]
-    );
+    const children = React.Children.toArray(this.props.children);
+    const orderedChildren = order.map(childIndex => children[childIndex]);
     const TagName = this.props.tagName;
     const xy = this._getXY();
 
