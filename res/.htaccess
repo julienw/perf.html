@@ -5,8 +5,8 @@
 RewriteEngine On
 
 # Redirect requests from www.perf-html.io to perf-html.io
-RewriteCond %{HTTP_HOST} !^perf-html\.io$ [NC]
-RewriteRule ^(.*)$ https://perf-html.io/$1 [L,R=301]
+#RewriteCond %{HTTP_HOST} !^perf-html\.io$ [NC]
+#RewriteRule ^(.*)$ https://perf-html.io/$1 [L,R=301]
 
 # If an existing asset or directory is requested go to it as it is
 RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f [OR]
