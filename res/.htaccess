@@ -20,5 +20,5 @@ RewriteRule ^ /index.html
 Header set X-Content-Type-Options nosniff
 Header set X-XSS-Protection "1; mode=block"
 Header set X-Frame-Options SAMEORIGIN
-Header set Content-Security-Policy "default-src *; img-src: *; object-src 'none'; connect-src: 'self' https://profile-store.commondatastorage.googleapis.com; frame-ancestors 'self'; form-action: 'none'; upgrade-insecure-requests"
+Header set Content-Security-Policy "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src *; object-src 'none'; connect-src 'self' https://profile-store.commondatastorage.googleapis.com; frame-ancestors 'self'; form-action 'none'; upgrade-insecure-requests"
 Header set Referrer-Policy same-origin
