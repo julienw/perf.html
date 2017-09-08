@@ -117,7 +117,7 @@ export default function withTimelineViewport<Props: ViewportProps>(
       this.state = this.getDefaultState(props);
     }
 
-    getHorizontalViewport({ selection, timeRange }: Props) {
+    getHorizontalViewport({ selection, timeRange }: ViewportProps) {
       if (selection.hasSelection) {
         const { selectionStart, selectionEnd } = selection;
         const timeRangeLength = timeRange.end - timeRange.start;
@@ -132,7 +132,7 @@ export default function withTimelineViewport<Props: ViewportProps>(
       };
     }
 
-    getDefaultState(props: Props) {
+    getDefaultState(props: ViewportProps) {
       const { viewportLeft, viewportRight } = this.getHorizontalViewport(props);
       return {
         containerWidth: 0,
@@ -169,14 +169,14 @@ export default function withTimelineViewport<Props: ViewportProps>(
       }, 1000);
     }
 
-    componentDidUpdate(prevProps: ViewportProps) {
+    componentDidUpdate(prevProps: Props) {
       if (this.props.viewportNeedsUpdate(prevProps, this.props)) {
         this.setState(this.getDefaultState(this.props));
         this._setSizeNextFrame();
       }
     }
 
-    componentWillReceiveProps(newProps: ViewportProps) {
+    componentWillReceiveProps(newProps: Props) {
       if (this.props.isRowExpanded !== newProps.isRowExpanded) {
         this.setState(this.getDefaultState(newProps));
         this._setSizeNextFrame();
