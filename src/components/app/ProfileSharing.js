@@ -140,9 +140,10 @@ class ProfileSharingCompositeButton extends PureComponent<
     return shortenUrl(this.state.fullUrl)
       .then(shortUrl => {
         this.setState({ shortUrl });
-        if (this._permalinkTextField) {
-          this._permalinkTextField.focus();
-          this._permalinkTextField.select();
+        const textField = this._permalinkTextField;
+        if (textField) {
+          textField.focus();
+          textField.select();
         }
       })
       .catch(() => {});
