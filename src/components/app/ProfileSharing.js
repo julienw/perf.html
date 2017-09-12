@@ -84,11 +84,11 @@ class ProfileSharingCompositeButton extends PureComponent<
   ProfileSharingCompositeButtonState
 > {
   props: ProfileSharingCompositeButtonProps;
-  _permalinkButton: ButtonWithPanel<any> | null;
-  _uploadErrorButton: ButtonWithPanel<any> | null;
+  _permalinkButton: ButtonWithPanel | null;
+  _uploadErrorButton: ButtonWithPanel | null;
   _permalinkTextField: HTMLInputElement | null;
-  _permalinkButtonCreated: (ButtonWithPanel<any> | null) => void;
-  _uploadErrorButtonCreated: (ButtonWithPanel<any> | null) => void;
+  _permalinkButtonCreated: (ButtonWithPanel | null) => void;
+  _uploadErrorButtonCreated: (ButtonWithPanel | null) => void;
   _permalinkTextFieldCreated: (HTMLInputElement | null) => void;
 
   constructor(props: ProfileSharingCompositeButtonProps) {
@@ -106,10 +106,10 @@ class ProfileSharingCompositeButton extends PureComponent<
     (this: any)._attemptToShare = this._attemptToShare.bind(this);
     (this: any)._onPermalinkPanelOpen = this._onPermalinkPanelOpen.bind(this);
     (this: any)._onPermalinkPanelClose = this._onPermalinkPanelClose.bind(this);
-    this._permalinkButtonCreated = (elem: ButtonWithPanel<any> | null) => {
+    this._permalinkButtonCreated = (elem: ButtonWithPanel | null) => {
       this._permalinkButton = elem;
     };
-    this._uploadErrorButtonCreated = (elem: ButtonWithPanel<any> | null) => {
+    this._uploadErrorButtonCreated = (elem: ButtonWithPanel | null) => {
       this._uploadErrorButton = elem;
     };
     this._permalinkTextFieldCreated = (elem: HTMLInputElement | null) => {

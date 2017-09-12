@@ -10,17 +10,17 @@ import classNames from 'classnames';
 require('./ButtonWithPanel.css');
 
 interface Panel {
-  props: {
+  +props: {
     onOpen?: () => mixed,
     onClose?: () => mixed,
   },
   open(): mixed,
 }
 
-type Props<P> = {
+type Props = {
   className: string,
   label: string,
-  panel: P,
+  panel: Panel & React.Element<>,
   open?: boolean,
 };
 
@@ -28,16 +28,14 @@ type State = {|
   open: boolean,
 |};
 
-class ButtonWithPanel<
-  P: React.Element<any> & Panel
-> extends React.PureComponent<Props<P>, State> {
-  _panel: P | null;
+class ButtonWithPanel extends React.PureComponent<Props, State> {
+  _panel: Panel | null;
 
   _onPanelOpen: () => void;
   _onPanelClose: () => void;
-  _panelCreated: (P | null) => void;
+  _panelCreated: ((React.Element<any> & Panel) | null) => void;
 
-  constructor(props: Props<P>) {
+  constructor(props: Props) {
     super(props);
     this.state = { open: !!props.open };
     this._onPanelOpen = () => {
@@ -53,12 +51,12 @@ class ButtonWithPanel<
       }
     };
     (this: any)._onButtonClick = this._onButtonClick.bind(this);
-    this._panelCreated = (panel: P | null) => {
+    this._panelCreated = (panel: (React.Element<any> & Panel) | null) => {
       this._panel = panel;
     };
   }
 
-  componentWillReceiveProps(props: Props<P>) {
+  componentWillReceiveProps(props: Props) {
     if (props.open !== this.props.open) {
       this.setState({ open: !!props.open });
     }
