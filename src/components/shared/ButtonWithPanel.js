@@ -9,18 +9,21 @@ import classNames from 'classnames';
 
 require('./ButtonWithPanel.css');
 
+type PanelProps = {
+  onOpen?: () => mixed,
+  onClose?: () => mixed,
+};
+
 interface Panel {
-  +props: {
-    onOpen?: () => mixed,
-    onClose?: () => mixed,
-  },
   open(): mixed,
 }
 
 type Props = {
   className: string,
   label: string,
-  panel: Panel & React.Element<>,
+  panel: React.Element<
+    Class<Panel & React.Component<$Subtype<PanelProps>, any>>
+  >,
   open?: boolean,
 };
 
@@ -33,7 +36,7 @@ class ButtonWithPanel extends React.PureComponent<Props, State> {
 
   _onPanelOpen: () => void;
   _onPanelClose: () => void;
-  _panelCreated: ((React.Element<any> & Panel) | null) => void;
+  _panelCreated: (Panel | null) => void;
 
   constructor(props: Props) {
     super(props);
@@ -51,7 +54,7 @@ class ButtonWithPanel extends React.PureComponent<Props, State> {
       }
     };
     (this: any)._onButtonClick = this._onButtonClick.bind(this);
-    this._panelCreated = (panel: (React.Element<any> & Panel) | null) => {
+    this._panelCreated = (panel: Panel | null) => {
       this._panel = panel;
     };
   }
