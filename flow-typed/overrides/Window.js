@@ -4,24 +4,16 @@
 // @flow
 
 import type { IDBFactory, IDBKeyRange } from '../../src/types/indexeddb';
+import type { SymbolTableAsTuple } from '../../src/profile-logic/symbol-store-db';
 
 type Lib = { debugName: string };
-
-declare class SymbolTable {
-  constructor(): SymbolTable,
-  getFuncAddressTableForLib(lib: Lib): Promise<Uint32Array>,
-  getSymbolsForAddressesInLib(
-    requestedAddressesIndices: number[],
-    lib: Lib
-  ): Promise<string[]>,
-}
 
 declare class GeckoProfiler {
   getProfile: () => Object,
   getSymbolTable: (
     debugName: string,
     breakpadId: string
-  ) => Promise<SymbolTable>,
+  ) => Promise<SymbolTableAsTuple>,
 }
 
 declare class Window extends EventTarget {
@@ -47,7 +39,7 @@ declare class Window extends EventTarget {
   requestAnimationFrame: typeof requestAnimationFrame,
   devicePixelRatio: number,
   indexedDB: IDBFactory,
-  IDBKeyRange: IDBKeyRange,
+  IDBKeyRange: IDBKeyRange<>,
   innerWidth: number,
   innerHeight: number,
   location: Location,
