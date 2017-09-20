@@ -39,12 +39,12 @@ class ProfileCallTreeSettings extends PureComponent<Props> {
     );
   }
 
-  _onImplementationFilterChange(e: Event & { target: HTMLSelectElement }) {
-    this.props.changeImplementationFilter(e.target.value);
+  _onImplementationFilterChange(e: SyntheticEvent<HTMLSelectElement>) {
+    this.props.changeImplementationFilter(e.currentTarget.value);
   }
 
-  _onInvertCallstackClick(e: Event & { target: HTMLInputElement }) {
-    this.props.changeInvertCallstack(e.target.checked);
+  _onInvertCallstackClick(e: SyntheticEvent<HTMLInputElement>) {
+    this.props.changeInvertCallstack(e.currentTarget.checked);
   }
 
   _onSearchFieldIdleAfterChange(value: string) {
