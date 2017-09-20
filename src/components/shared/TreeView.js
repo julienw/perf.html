@@ -79,7 +79,7 @@ type TreeViewRowFixedColumnsProps = {
   columns: Column[],
   index: number,
   selected: boolean,
-  onClick: (IndexIntoCallNodeTable, MouseEvent) => mixed,
+  onClick: (IndexIntoCallNodeTable, SyntheticMouseEvent<>) => mixed,
   highlightString: string,
 };
 
@@ -91,7 +91,7 @@ class TreeViewRowFixedColumns extends PureComponent<
     (this: any)._onClick = this._onClick.bind(this);
   }
 
-  _onClick(event: MouseEvent) {
+  _onClick(event: SyntheticMouseEvent<>) {
     const { nodeId, onClick } = this.props;
     onClick(nodeId, event);
   }
@@ -142,7 +142,7 @@ type TreeViewRowScrolledColumnsProps = {
   isExpanded: boolean,
   selected: boolean,
   onToggle: (IndexIntoCallNodeTable, boolean, boolean) => mixed,
-  onClick: (IndexIntoCallNodeTable, MouseEvent) => mixed,
+  onClick: (IndexIntoCallNodeTable, SyntheticMouseEvent<>) => mixed,
   onAppendageButtonClick:
     | ((IndexIntoCallNodeTable | null, string) => mixed)
     | null,
@@ -157,7 +157,7 @@ class TreeViewRowScrolledColumns extends PureComponent<
     (this: any)._onClick = this._onClick.bind(this);
   }
 
-  _onClick(event: MouseEvent & { target: Element }) {
+  _onClick(event: SyntheticMouseEvent<Element>) {
     const {
       nodeId,
       isExpanded,
@@ -165,13 +165,15 @@ class TreeViewRowScrolledColumns extends PureComponent<
       onClick,
       onAppendageButtonClick,
     } = this.props;
-    if (event.target.classList.contains('treeRowToggleButton')) {
+    if (event.currentTarget.classList.contains('treeRowToggleButton')) {
       onToggle(nodeId, !isExpanded, event.altKey === true);
-    } else if (event.target.classList.contains('treeViewRowAppendageButton')) {
+    } else if (
+      event.currentTarget.classList.contains('treeViewRowAppendageButton')
+    ) {
       if (onAppendageButtonClick) {
         onAppendageButtonClick(
           nodeId,
-          event.target.getAttribute('data-appendage-button-name') || ''
+          event.currentTarget.getAttribute('data-appendage-button-name') || ''
         );
       }
     } else {
@@ -425,7 +427,7 @@ class TreeView extends PureComponent<TreeViewProps> {
     this.props.onSelectionChange(nodeId);
   }
 
-  _onRowClicked(nodeId: IndexIntoCallNodeTable, event: MouseEvent) {
+  _onRowClicked(nodeId: IndexIntoCallNodeTable, event: SyntheticMouseEvent<>) {
     this._select(nodeId);
     if (event.detail === 2 && event.button === 0) {
       // double click
