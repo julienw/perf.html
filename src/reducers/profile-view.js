@@ -5,48 +5,45 @@
 /* eslint-disable */
 import { createSelector } from 'reselect';
 
-import type { Profile, Thread, ThreadIndex } from '../types/profile';
-import type { State, ProfileViewState } from '../types/reducers';
-import type { Transform, TransformStack } from '../types/transforms';
+type UrlState = {
+  selectedThread: number,
+};
+
+type State = {
+  urlState: UrlState,
+};
 
 /**
  * Profile
  */
-export const getProfileView = (state: State): ProfileViewState =>
-  state.profileView;
-export const getProfile = (state: State): Profile =>
-  getProfileView(state).profile;
-export const getThreads = (state: State): Thread[] => getProfile(state).threads;
+export const getThreads = (state: State): string => 'foo';
 export type SelectorsForThread = {
   getTransformLabels: State => string[],
 };
-const getMyTransformStack = (
-  state: State,
-  threadIndex: ThreadIndex
-): TransformStack => {
-  return state.urlState.transforms[threadIndex] || [];
+const getTransformStack = (state: State): string => {
+  return 'foo';
 };
 
-const selectorsForThreads: { [key: ThreadIndex]: SelectorsForThread } = {};
+const selectorsForThreads: { [key: number]: SelectorsForThread } = {};
 
 export function getMyFriendlyThreadName(
-  _threads: Thread[],
-  _thread: Thread
+  _threads: string,
+  _thread: string
 ): string {
   return 'foo';
 }
 
 export function getMyTransformLabels(
-  _thread: Thread,
+  _thread: string,
   _threadName: string,
-  _transforms: Transform[]
+  _transforms: string
 ) {
   const labels = ['plop'];
   return labels;
 }
 
 export const selectorsForThread = (
-  threadIndex: ThreadIndex
+  threadIndex: number
 ): SelectorsForThread => {
   if (!(threadIndex in selectorsForThreads)) {
     /**
@@ -60,10 +57,7 @@ export const selectorsForThread = (
      * 5. Search - Exclude samples that don't include some text in the stack.
      * 6. Range selection - Only include samples that are within a user's sub-selection.
      */
-    const getThread = (state: State): Thread =>
-      getProfile(state).threads[threadIndex];
-    const getTransformStack = (state: State): TransformStack =>
-      getMyTransformStack(state, threadIndex);
+    const getThread = (state: State): string => 'bar';
     const getFriendlyThreadName = createSelector(
       getThreads,
       getThread,
