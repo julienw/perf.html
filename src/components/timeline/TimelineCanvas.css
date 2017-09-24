@@ -1,9 +1,0 @@
-.timelineCanvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.timelineCanvas.hover {
-  cursor: default;
-}
