@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 .listWithRemoveButton {
-  z-index: 100;
   position: relative; /* To create a stacking context for z-index to work */
+  z-index: 100;
 
   line-height: 24px;
 }
@@ -68,7 +68,7 @@
   color: var(--grey-50);
 }
 
-/* Are the boxes displayed ? */
+/* Rules to actually display the various states of the list */
 :not(.listWithRemoveButton_isFull) > .listWithRemoveButton_introduction,
 :not(.listWithRemoveButton_isCompact) > .listWithRemoveButton_compact,
 :not(.listWithRemoveButton_isFull) > .listWithRemoveButton_full {

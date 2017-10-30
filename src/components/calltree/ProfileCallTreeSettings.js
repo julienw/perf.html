@@ -11,7 +11,7 @@ import {
   changeInvertCallstack,
   commitCallTreeSearchString,
   changeCurrentCallTreeSearchString,
-  popCallTreeSearchString,
+  removeCallTreeSearchString,
 } from '../../actions/profile-view';
 import {
   getImplementationFilter,
@@ -36,7 +36,7 @@ type Props = {|
   +changeInvertCallstack: typeof changeInvertCallstack,
   +commitCallTreeSearchString: typeof commitCallTreeSearchString,
   +changeCurrentCallTreeSearchString: typeof changeCurrentCallTreeSearchString,
-  +popCallTreeSearchString: typeof popCallTreeSearchString,
+  +removeCallTreeSearchString: typeof removeCallTreeSearchString,
 |};
 
 class ProfileCallTreeSettings extends PureComponent {
@@ -92,7 +92,7 @@ class ProfileCallTreeSettings extends PureComponent {
 
   _onSearchStringRemove(searchStringIdx: number) {
     const searchString = this.props.searchStrings[searchStringIdx];
-    this.props.popCallTreeSearchString(searchString);
+    this.props.removeCallTreeSearchString(searchString);
   }
 
   render() {
@@ -176,6 +176,6 @@ export default connect(
     changeInvertCallstack,
     changeCurrentCallTreeSearchString,
     commitCallTreeSearchString,
-    popCallTreeSearchString,
+    removeCallTreeSearchString,
   }
 )(ProfileCallTreeSettings);

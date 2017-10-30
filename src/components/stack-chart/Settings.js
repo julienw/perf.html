@@ -11,7 +11,7 @@ import {
   changeInvertCallstack,
   changeCurrentCallTreeSearchString,
   commitCallTreeSearchString,
-  popCallTreeSearchString,
+  removeCallTreeSearchString,
 } from '../../actions/profile-view';
 import {
   getHidePlatformDetails,
@@ -33,7 +33,7 @@ type Props = {|
   +changeInvertCallstack: boolean => void,
   +changeCurrentCallTreeSearchString: string => void,
   +commitCallTreeSearchString: () => void,
-  +popCallTreeSearchString: string => void,
+  +removeCallTreeSearchString: string => void,
 |};
 
 class StackChartSettings extends PureComponent {
@@ -85,7 +85,7 @@ class StackChartSettings extends PureComponent {
 
   _onSearchStringRemove(searchStringIdx: number) {
     const searchString = this.props.searchStrings[searchStringIdx];
-    this.props.popCallTreeSearchString(searchString);
+    this.props.removeCallTreeSearchString(searchString);
   }
 
   render() {
@@ -165,6 +165,6 @@ export default connect(
     changeInvertCallstack,
     changeCurrentCallTreeSearchString,
     commitCallTreeSearchString,
-    popCallTreeSearchString,
+    removeCallTreeSearchString,
   }
 )(StackChartSettings);

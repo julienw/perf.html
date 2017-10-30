@@ -141,7 +141,7 @@ type UrlStateAction =
   | { type: 'CHANGE_SELECTED_THREAD', selectedThread: ThreadIndex }
   | {| type: 'CHANGE_CURRENT_CALL_TREE_SEARCH_STRING', searchString: string |}
   | {| type: 'COMMIT_CALL_TREE_SEARCH_STRING' |}
-  | {| type: 'POP_CALL_TREE_SEARCH_STRING', searchString: string |}
+  | {| type: 'REMOVE_CALL_TREE_SEARCH_STRING', searchString: string |}
   | {
       type: 'ADD_TRANSFORM_TO_STACK',
       threadIndex: ThreadIndex,

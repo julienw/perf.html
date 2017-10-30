@@ -103,8 +103,8 @@ export function urlStateToUrlObject(urlState: UrlState): UrlObject {
   const selectedTab = urlState.selectedTab;
   switch (selectedTab) {
     case 'calltree':
-      query.search = urlState.calltreeSearchString.stack;
-      query.currentSearch = urlState.calltreeSearchString.current || undefined;
+      query.search = urlState.callTreeSearchString.stack;
+      query.currentSearch = urlState.callTreeSearchString.current || undefined;
       query.invertCallstack = urlState.invertCallstack ? null : undefined;
       query.implementation =
         urlState.implementation === 'combined'
@@ -118,8 +118,8 @@ export function urlStateToUrlObject(urlState: UrlState): UrlObject {
       query.markerSearch = urlState.markersSearchString;
       break;
     case 'stack-chart':
-      query.search = urlState.calltreeSearchString.stack;
-      query.currentSearch = urlState.calltreeSearchString.current || undefined;
+      query.search = urlState.callTreeSearchString.stack;
+      query.currentSearch = urlState.callTreeSearchString.current || undefined;
       query.invertCallstack = urlState.invertCallstack ? null : undefined;
       query.hidePlatformDetails = urlState.hidePlatformDetails
         ? null
@@ -214,7 +214,7 @@ export function stateFromLocation(location: Location): UrlState {
     selectedTab: toValidTabSlug(pathParts[selectedTabPathPart]),
     rangeFilters: query.range ? parseRangeFilters(query.range) : [],
     selectedThread: selectedThread,
-    calltreeSearchString: {
+    callTreeSearchString: {
       stack: searchStack,
       current: query.currentSearch || '',
     },

@@ -129,7 +129,7 @@ function selectedThread(state: ThreadIndex = 0, action: Action) {
   }
 }
 
-function calltreeSearchString(
+function callTreeSearchString(
   state: SearchStringState = { current: '', stack: [] },
   action: Action
 ) {
@@ -156,7 +156,7 @@ function calltreeSearchString(
         stack: state.stack,
         current: action.searchString,
       };
-    case 'POP_CALL_TREE_SEARCH_STRING': {
+    case 'REMOVE_CALL_TREE_SEARCH_STRING': {
       const searchString = action.searchString;
       return {
         current: state.current,
@@ -297,7 +297,7 @@ const urlStateReducer: Reducer<UrlState> = (regularUrlStateReducer => (
     selectedTab,
     rangeFilters,
     selectedThread,
-    calltreeSearchString,
+    callTreeSearchString,
     implementation,
     invertCallstack,
     hidePlatformDetails,
@@ -323,9 +323,9 @@ export const getHidePlatformDetails = (state: State) =>
 export const getInvertCallstack = (state: State) =>
   getUrlState(state).invertCallstack;
 export const getSearchStrings = (state: State) =>
-  getUrlState(state).calltreeSearchString.stack;
+  getUrlState(state).callTreeSearchString.stack;
 export const getCurrentSearchString = (state: State) =>
-  getUrlState(state).calltreeSearchString.current;
+  getUrlState(state).callTreeSearchString.current;
 export const getSearchStringsForFiltering = createSelector(
   getSearchStrings,
   getCurrentSearchString,

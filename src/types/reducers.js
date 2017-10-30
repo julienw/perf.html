@@ -80,7 +80,7 @@ export type UrlState = {|
   selectedTab: TabSlug,
   rangeFilters: RangeFilterState[],
   selectedThread: ThreadIndex,
-  calltreeSearchString: SearchStringState,
+  callTreeSearchString: SearchStringState,
   markersSearchString: string,
   implementation: ImplementationFilter,
   invertCallstack: boolean,

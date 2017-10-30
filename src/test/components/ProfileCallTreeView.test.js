@@ -13,7 +13,7 @@ import { getProfileFromTextSamples } from '../fixtures/profiles/make-profile';
 import {
   changeCurrentCallTreeSearchString,
   commitCallTreeSearchString,
-  popCallTreeSearchString,
+  removeCallTreeSearchString,
 } from '../../actions/profile-view';
 import { getBoundingBox } from '../fixtures/utils';
 
@@ -86,7 +86,7 @@ describe('calltree/ProfileCallTreeView', function() {
     store.dispatch(changeCurrentCallTreeSearchString('E'));
     expect(calltree).toMatchSnapshot();
 
-    store.dispatch(popCallTreeSearchString('F'));
+    store.dispatch(removeCallTreeSearchString('F'));
     expect(calltree).toMatchSnapshot();
   });
 });

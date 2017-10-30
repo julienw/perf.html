@@ -128,6 +128,8 @@ export default class CompactableListWithRemoveButton extends PureComponent {
       `listWithRemoveButton_${compact ? 'isCompact' : 'isFull'}`
     );
 
+    // We always render the 2 states to the DOM but only display one of them
+    // using CSS.
     return (
       <div className={classes}>
         {this._renderCompact()}

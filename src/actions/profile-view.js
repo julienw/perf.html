@@ -76,6 +76,9 @@ export function showThread(threadIndex: ThreadIndex): Action {
   };
 }
 
+// ---- Search string related actions ----
+//
+// 1. Changes the current search string, the one the user is currently typing.
 export function changeCurrentCallTreeSearchString(
   searchString: string
 ): Action {
@@ -85,18 +88,23 @@ export function changeCurrentCallTreeSearchString(
   };
 }
 
+// 2. Commit it the current search string to the search stack.
+// This is intended for when the user presses enter.
 export function commitCallTreeSearchString(): Action {
   return {
     type: 'COMMIT_CALL_TREE_SEARCH_STRING',
   };
 }
 
-export function popCallTreeSearchString(searchString: string): Action {
+// 3. This is for removing one of the strings from the list.
+export function removeCallTreeSearchString(searchString: string): Action {
   return {
-    type: 'POP_CALL_TREE_SEARCH_STRING',
+    type: 'REMOVE_CALL_TREE_SEARCH_STRING',
     searchString,
   };
 }
+
+// --- End of search string related actions ----
 
 export function changeExpandedCallNodes(
   threadIndex: ThreadIndex,
