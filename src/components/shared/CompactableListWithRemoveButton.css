@@ -16,6 +16,7 @@
 
 .listWithRemoveButton_full-itemBox {
   display: flex;
+  flex-direction: row-reverse;
 
   background: white;
   border: 1px solid var(--grey-40);
@@ -40,6 +41,12 @@
 
   flex: none;
   padding: 0 5px;
+}
+
+.listWithRemoveButton_full-button:hover,
+.listWithRemoveButton_full-button:focus {
+  background: rgba(12, 12, 13, .2);
+  border-radius: 2px;
 }
 
 .listWithRemoveButton_compact {

@@ -27,6 +27,16 @@ function englishListJoin(list: React$Element<any>[]) {
   }
 }
 
+// This function expects an input string where one visible character == one
+// character in the string.
+function shortenText(text: string, charCount: number): string {
+  if (text.length <= charCount) {
+    return text;
+  }
+
+  return text.slice(0, charCount - 1) + '…';
+}
+
 type Props = {|
   +className?: string,
   +compact: boolean,
@@ -76,7 +86,7 @@ export default class CompactableListWithRemoveButton extends PureComponent {
           >
             <div className="listWithRemoveButton_full-itemBox">
               <div className="listWithRemoveButton_full-item">
-                {item}
+                {shortenText(item, 50)}
               </div>
               <button
                 className="listWithRemoveButton_full-button"
@@ -107,7 +117,7 @@ export default class CompactableListWithRemoveButton extends PureComponent {
           {englishListJoin(
             items.map(item =>
               <span key={item}>
-                {item}
+                {shortenText(item, 20)}
               </span>
             )
           )}
