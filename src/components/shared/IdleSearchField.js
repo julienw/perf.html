@@ -12,7 +12,7 @@ type Props = {|
   +onIdleAfterChange: string => void,
   +onSubmit?: () => void,
   +onFocus?: () => void,
-  +onBlur?: () => void,
+  +onBlur?: (Element | null) => void,
   +idlePeriod: number,
   +defaultValue: ?string,
   +className: ?string,
@@ -52,9 +52,9 @@ class IdleSearchField extends PureComponent {
     }
   }
 
-  _onSearchFieldBlur() {
+  _onSearchFieldBlur(e: { relatedTarget: Element | null }) {
     if (this.props.onBlur) {
-      this.props.onBlur();
+      this.props.onBlur(e.relatedTarget);
     }
   }
 

@@ -140,8 +140,10 @@ export default class CompactableListWithRemoveButton extends PureComponent {
 
     // We always render the 2 states to the DOM but only display one of them
     // using CSS.
+    // Note: the tabIndex attribute makes the div focusable, and therefore the
+    // FocusEvent's relatedTarget is properly set
     return (
-      <div className={classes}>
+      <div className={classes} tabIndex="-1">
         {this._renderCompact()}
         {this._renderFull()}
       </div>

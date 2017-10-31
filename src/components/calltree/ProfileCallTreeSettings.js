@@ -41,7 +41,7 @@ type Props = {|
 
 class ProfileCallTreeSettings extends PureComponent {
   props: Props;
-  state: {| focused: boolean |};
+  state: {| searchFieldFocused: boolean |};
 
   constructor(props: Props) {
     super(props);
@@ -59,7 +59,7 @@ class ProfileCallTreeSettings extends PureComponent {
     (this: any)._onSearchFieldFocus = this._onSearchFieldFocus.bind(this);
     (this: any)._onSearchFieldBlur = this._onSearchFieldBlur.bind(this);
 
-    this.state = { focused: false };
+    this.state = { searchFieldFocused: false };
   }
 
   _onImplementationFilterChange(e: Event & { target: HTMLSelectElement }) {
@@ -79,11 +79,20 @@ class ProfileCallTreeSettings extends PureComponent {
   }
 
   _onSearchFieldFocus() {
-    this.setState({ focused: true });
+    this.setState({ searchFieldFocused: true });
   }
 
-  _onSearchFieldBlur() {
-    this.setState(() => ({ focused: false }));
+  _onSearchFieldBlur(relatedTarget: Element | null) {
+    if (
+      relatedTarget &&
+      relatedTarget.matches('.profileCallTreeSettingsSearchbar *')
+    ) {
+      // Do not change the state if the blur's related target is still inside
+      // the search bar. The focus should move back automatically to the input
+      // box thanks to the <label> element's behavior.
+      return;
+    }
+    this.setState(() => ({ searchFieldFocused: false }));
   }
 
   _onSearchFieldSubmit() {
@@ -102,7 +111,7 @@ class ProfileCallTreeSettings extends PureComponent {
       currentSearchString,
       searchStrings,
     } = this.props;
-    const { focused } = this.state;
+    const { searchFieldFocused } = this.state;
 
     return (
       <div className="profileCallTreeSettings">
@@ -148,7 +157,7 @@ class ProfileCallTreeSettings extends PureComponent {
             />
             <CompactableListWithRemoveButton
               items={searchStrings}
-              compact={!focused}
+              compact={!searchFieldFocused}
               showIntroduction={
                 currentSearchString.length > 0
                   ? 'You can press enter to persist this search term.'
