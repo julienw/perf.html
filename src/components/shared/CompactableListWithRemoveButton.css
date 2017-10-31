@@ -81,8 +81,3 @@
   opacity: 0.01;
   transform: translateY(-100%);
 }
-
-.listWithRemoveButton_full_transition-exit-active {
-  opacity: 0.01;
-  transform: translateX(100%);
-}
