@@ -9,9 +9,8 @@ import { connect } from 'react-redux';
 import {
   changeHidePlatformDetails,
   changeInvertCallstack,
-  changeCurrentCallTreeSearchString,
-  commitCallTreeSearchString,
-  removeCallTreeSearchString,
+  changeCallTreeSearchString,
+  removeCallTreeSearchStringPart,
 } from '../../actions/profile-view';
 import {
   getHidePlatformDetails,
@@ -31,9 +30,8 @@ type Props = {|
   +searchStrings: string[],
   +changeHidePlatformDetails: boolean => void,
   +changeInvertCallstack: boolean => void,
-  +changeCurrentCallTreeSearchString: string => void,
-  +commitCallTreeSearchString: () => void,
-  +removeCallTreeSearchString: string => void,
+  +changeCallTreeSearchString: string => void,
+  +removeCallTreeSearchStringPart: string => void,
 |};
 
 class StackChartSettings extends PureComponent {
@@ -51,7 +49,6 @@ class StackChartSettings extends PureComponent {
     (this: any)._onSearchFieldIdleAfterChange = this._onSearchFieldIdleAfterChange.bind(
       this
     );
-    (this: any)._onSearchFieldSubmit = this._onSearchFieldSubmit.bind(this);
     (this: any)._onSearchStringRemove = this._onSearchStringRemove.bind(this);
     (this: any)._onSearchFieldFocus = this._onSearchFieldFocus.bind(this);
     (this: any)._onSearchFieldBlur = this._onSearchFieldBlur.bind(this);
@@ -68,7 +65,7 @@ class StackChartSettings extends PureComponent {
   }
 
   _onSearchFieldIdleAfterChange(value: string) {
-    this.props.changeCurrentCallTreeSearchString(value);
+    this.props.changeCallTreeSearchString(value);
   }
 
   _onSearchFieldFocus() {
@@ -79,13 +76,9 @@ class StackChartSettings extends PureComponent {
     this.setState(() => ({ focused: false }));
   }
 
-  _onSearchFieldSubmit() {
-    this.props.commitCallTreeSearchString();
-  }
-
   _onSearchStringRemove(searchStringIdx: number) {
     const searchString = this.props.searchStrings[searchStringIdx];
-    this.props.removeCallTreeSearchString(searchString);
+    this.props.removeCallTreeSearchStringPart(searchString);
   }
 
   render() {
@@ -131,7 +124,6 @@ class StackChartSettings extends PureComponent {
               idlePeriod={200}
               defaultValue={currentSearchString}
               onIdleAfterChange={this._onSearchFieldIdleAfterChange}
-              onSubmit={this._onSearchFieldSubmit}
               onBlur={this._onSearchFieldBlur}
               onFocus={this._onSearchFieldFocus}
             />
@@ -163,8 +155,7 @@ export default connect(
   {
     changeHidePlatformDetails,
     changeInvertCallstack,
-    changeCurrentCallTreeSearchString,
-    commitCallTreeSearchString,
-    removeCallTreeSearchString,
+    changeCallTreeSearchString,
+    removeCallTreeSearchStringPart,
   }
 )(StackChartSettings);

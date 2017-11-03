@@ -80,7 +80,7 @@ export default class CompactableListWithRemoveButton extends PureComponent {
       <TransitionGroup className="listWithRemoveButton_full">
         {items.map((item, i) =>
           <CSSTransition
-            key={item}
+            key={i}
             classNames="listWithRemoveButton_full_transition"
             timeout={300}
           >

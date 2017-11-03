@@ -68,11 +68,6 @@ export type RangeFilterState = {
   end: number,
 };
 
-export type SearchStringState = {|
-  +current: string,
-  +stack: string[],
-|};
-
 export type UrlState = {|
   dataSource: DataSource,
   hash: string,
@@ -80,7 +75,7 @@ export type UrlState = {|
   selectedTab: TabSlug,
   rangeFilters: RangeFilterState[],
   selectedThread: ThreadIndex,
-  callTreeSearchString: SearchStringState,
+  callTreeSearchString: string,
   markersSearchString: string,
   implementation: ImplementationFilter,
   invertCallstack: boolean,

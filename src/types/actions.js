@@ -139,9 +139,8 @@ type UrlStateAction =
   | { type: 'ADD_RANGE_FILTER', start: number, end: number }
   | { type: 'POP_RANGE_FILTERS', firstRemovedFilterIndex: number }
   | { type: 'CHANGE_SELECTED_THREAD', selectedThread: ThreadIndex }
-  | {| type: 'CHANGE_CURRENT_CALL_TREE_SEARCH_STRING', searchString: string |}
-  | {| type: 'COMMIT_CALL_TREE_SEARCH_STRING' |}
-  | {| type: 'REMOVE_CALL_TREE_SEARCH_STRING', searchString: string |}
+  | {| type: 'CHANGE_CALL_TREE_SEARCH_STRING', searchString: string |}
+  | {| type: 'REMOVE_CALL_TREE_SEARCH_STRING_PART', searchStringPart: string |}
   | {
       type: 'ADD_TRANSFORM_TO_STACK',
       threadIndex: ThreadIndex,

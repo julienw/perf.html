@@ -9,9 +9,8 @@ import { connect } from 'react-redux';
 import {
   changeImplementationFilter,
   changeInvertCallstack,
-  commitCallTreeSearchString,
-  changeCurrentCallTreeSearchString,
-  removeCallTreeSearchString,
+  changeCallTreeSearchString,
+  removeCallTreeSearchStringPart,
 } from '../../actions/profile-view';
 import {
   getImplementationFilter,
@@ -34,9 +33,8 @@ type Props = {|
   +searchStrings: string[],
   +changeImplementationFilter: typeof changeImplementationFilter,
   +changeInvertCallstack: typeof changeInvertCallstack,
-  +commitCallTreeSearchString: typeof commitCallTreeSearchString,
-  +changeCurrentCallTreeSearchString: typeof changeCurrentCallTreeSearchString,
-  +removeCallTreeSearchString: typeof removeCallTreeSearchString,
+  +changeCallTreeSearchString: typeof changeCallTreeSearchString,
+  +removeCallTreeSearchStringPart: typeof removeCallTreeSearchStringPart,
 |};
 
 class ProfileCallTreeSettings extends PureComponent {
@@ -54,7 +52,6 @@ class ProfileCallTreeSettings extends PureComponent {
     (this: any)._onSearchFieldIdleAfterChange = this._onSearchFieldIdleAfterChange.bind(
       this
     );
-    (this: any)._onSearchFieldSubmit = this._onSearchFieldSubmit.bind(this);
     (this: any)._onSearchStringRemove = this._onSearchStringRemove.bind(this);
     (this: any)._onSearchFieldFocus = this._onSearchFieldFocus.bind(this);
     (this: any)._onSearchFieldBlur = this._onSearchFieldBlur.bind(this);
@@ -75,7 +72,7 @@ class ProfileCallTreeSettings extends PureComponent {
   }
 
   _onSearchFieldIdleAfterChange(value: string) {
-    this.props.changeCurrentCallTreeSearchString(value);
+    this.props.changeCallTreeSearchString(value);
   }
 
   _onSearchFieldFocus() {
@@ -95,13 +92,9 @@ class ProfileCallTreeSettings extends PureComponent {
     this.setState(() => ({ searchFieldFocused: false }));
   }
 
-  _onSearchFieldSubmit() {
-    this.props.commitCallTreeSearchString();
-  }
-
   _onSearchStringRemove(searchStringIdx: number) {
     const searchString = this.props.searchStrings[searchStringIdx];
-    this.props.removeCallTreeSearchString(searchString);
+    this.props.removeCallTreeSearchStringPart(searchString);
   }
 
   render() {
@@ -151,7 +144,6 @@ class ProfileCallTreeSettings extends PureComponent {
               idlePeriod={200}
               defaultValue={currentSearchString}
               onIdleAfterChange={this._onSearchFieldIdleAfterChange}
-              onSubmit={this._onSearchFieldSubmit}
               onBlur={this._onSearchFieldBlur}
               onFocus={this._onSearchFieldFocus}
             />
@@ -183,8 +175,7 @@ export default connect(
   {
     changeImplementationFilter,
     changeInvertCallstack,
-    changeCurrentCallTreeSearchString,
-    commitCallTreeSearchString,
-    removeCallTreeSearchString,
+    changeCallTreeSearchString,
+    removeCallTreeSearchStringPart,
   }
 )(ProfileCallTreeSettings);

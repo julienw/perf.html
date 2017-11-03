@@ -11,9 +11,8 @@ import { Provider } from 'react-redux';
 import { storeWithProfile } from '../fixtures/stores';
 import { getProfileFromTextSamples } from '../fixtures/profiles/make-profile';
 import {
-  changeCurrentCallTreeSearchString,
-  commitCallTreeSearchString,
-  removeCallTreeSearchString,
+  changeCallTreeSearchString,
+  removeCallTreeSearchStringPart,
 } from '../../actions/profile-view';
 import { getBoundingBox } from '../fixtures/utils';
 
@@ -71,22 +70,19 @@ describe('calltree/ProfileCallTreeView', function() {
 
     expect(calltree).toMatchSnapshot();
 
-    store.dispatch(changeCurrentCallTreeSearchString('C'));
+    store.dispatch(changeCallTreeSearchString('C'));
     expect(calltree).toMatchSnapshot();
 
-    store.dispatch(commitCallTreeSearchString());
+    store.dispatch(changeCallTreeSearchString('C,'));
     expect(calltree).toMatchSnapshot();
 
-    store.dispatch(changeCurrentCallTreeSearchString('F'));
+    store.dispatch(changeCallTreeSearchString('C, F'));
     expect(calltree).toMatchSnapshot();
 
-    store.dispatch(commitCallTreeSearchString());
+    store.dispatch(changeCallTreeSearchString('C, F,E'));
     expect(calltree).toMatchSnapshot();
 
-    store.dispatch(changeCurrentCallTreeSearchString('E'));
-    expect(calltree).toMatchSnapshot();
-
-    store.dispatch(removeCallTreeSearchString('F'));
+    store.dispatch(removeCallTreeSearchStringPart('F'));
     expect(calltree).toMatchSnapshot();
   });
 });

@@ -12,7 +12,7 @@ import { getCallNodePath } from '../../profile-logic/profile-data';
 import {
   getInvertCallstack,
   getImplementationFilter,
-  getSearchStringsForFiltering,
+  getSearchStrings,
   getSelectedThreadIndex,
 } from '../../reducers/url-state';
 import {
@@ -216,7 +216,7 @@ export default connect(
     expandedCallNodeIndexes: selectedThreadSelectors.getExpandedCallNodeIndexes(
       state
     ),
-    searchStrings: getSearchStringsForFiltering(state),
+    searchStrings: getSearchStrings(state),
     disableOverscan: getProfileViewOptions(state).selection.isModifying,
     invertCallstack: getInvertCallstack(state),
     implementationFilter: getImplementationFilter(state),

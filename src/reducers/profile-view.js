@@ -544,7 +544,7 @@ export const selectorsForThread = (
     );
     const _getImplementationAndSearchFilteredThread = createSelector(
       _getImplementationFilteredThread,
-      UrlState.getSearchStringsForFiltering,
+      UrlState.getSearchStrings,
       (thread: Thread, searchStrings: string[]): Thread => {
         return ProfileData.filterThreadToSearchStrings(thread, searchStrings);
       }
@@ -680,7 +680,7 @@ export const selectorsForThread = (
       getRangeFilteredThread,
       UrlState.getHidePlatformDetails,
       UrlState.getInvertCallstack,
-      UrlState.getSearchStringsForFiltering,
+      UrlState.getSearchStrings,
       (
         thread: Thread,
         shouldHidePlatformDetails: boolean,
