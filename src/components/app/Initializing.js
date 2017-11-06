@@ -45,7 +45,7 @@ Initializing.propTypes = {
   profilerUrl: PropTypes.string.isRequired,
 };
 
-export default connect(() => ({
+export default connect((): * => ({
   className: 'initializing',
   profilerUrl: 'https://github.com/devtools-html/Gecko-Profiler-Addon',
 }))(Initializing);

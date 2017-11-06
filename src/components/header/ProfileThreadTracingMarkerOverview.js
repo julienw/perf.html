@@ -13,7 +13,7 @@ import {
 } from '../../profile-logic/interval-marker-styles';
 import { getSelectedThreadIndex } from '../../reducers/url-state';
 
-export default connect((state, props) => {
+export default connect((state, props): * => {
   const { threadIndex } = props;
   const selectors = selectorsForThread(threadIndex);
   const selectedThread = getSelectedThreadIndex(state);

@@ -241,10 +241,9 @@ function hiddenThreads(state: ThreadIndex[] = [], action: Action) {
   }
 }
 
-const urlStateReducer: Reducer<UrlState> = (regularUrlStateReducer => (
-  state: UrlState,
-  action: Action
-): UrlState => {
+const urlStateReducer: Reducer<UrlState> = ((
+  regularUrlStateReducer: Reducer<UrlState>
+) => (state: UrlState, action: Action): UrlState => {
   switch (action.type) {
     case '@@urlenhancer/updateUrlState':
       return action.urlState;

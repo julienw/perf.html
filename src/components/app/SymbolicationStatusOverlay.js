@@ -59,7 +59,7 @@ class SymbolicationStatusOverlay extends PureComponent<Props> {
   }
 }
 
-export default connect(state => ({
+export default connect((state): * => ({
   symbolicationStatus: getProfileViewOptions(state).symbolicationStatus,
   waitingForLibs: getProfileViewOptions(state).waitingForLibs,
 }))(SymbolicationStatusOverlay);

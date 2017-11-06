@@ -4,6 +4,7 @@
 
 // @flow
 
+import type { Reducer as ReduxReducer } from 'redux'; // eslint-disable-line import/named
 import type { ProfileSummary } from '../profile-logic/summarize-profile';
 import type {
   Action,
@@ -21,7 +22,7 @@ import type { GetLabel } from '../profile-logic/labeling-strategies';
 import type { GetCategory } from '../profile-logic/color-categories';
 import type { TransformStacksPerThread } from './transforms';
 
-export type Reducer<T> = (T, Action) => T;
+export type Reducer<T> = ReduxReducer<T, Action>;
 
 export type RequestedLib = { debugName: string, breakpadId: string };
 export type SymbolicationStatus = 'DONE' | 'SYMBOLICATING';
