@@ -6,6 +6,7 @@
 
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
+import classNames from 'classnames';
 import {
   changeImplementationFilter,
   changeInvertCallstack,
@@ -19,7 +20,7 @@ import {
   getSearchStrings,
 } from '../../reducers/url-state';
 import IdleSearchField from '../shared/IdleSearchField';
-import CompactableListWithRemoveButton from '../shared/CompactableListWithRemoveButton';
+import ListWithRemoveButton from '../shared/ListWithRemoveButton';
 import { toValidImplementationFilter } from '../../profile-logic/profile-data';
 
 import './ProfileCallTreeSettings.css';
@@ -105,6 +106,7 @@ class ProfileCallTreeSettings extends PureComponent {
       searchStrings,
     } = this.props;
     const { searchFieldFocused } = this.state;
+    const showIntroduction = searchFieldFocused && searchStrings.length === 1;
 
     return (
       <div className="profileCallTreeSettings">
@@ -147,17 +149,22 @@ class ProfileCallTreeSettings extends PureComponent {
               onBlur={this._onSearchFieldBlur}
               onFocus={this._onSearchFieldFocus}
             />
-            <CompactableListWithRemoveButton
-              items={searchStrings}
-              compact={!searchFieldFocused}
-              showIntroduction={
-                currentSearchString.length > 0
-                  ? 'You can press enter to persist this search term.'
-                  : ''
-              }
-              buttonTitle="Remove"
-              onItemRemove={this._onSearchStringRemove}
-            />
+            {searchStrings.length > 1 && searchFieldFocused
+              ? <ListWithRemoveButton
+                  items={searchStrings}
+                  buttonTitle="Remove"
+                  onItemRemove={this._onSearchStringRemove}
+                />
+              : null}
+            <div
+              className={classNames(
+                'profileCallTreeSettingsSearchIntroduction',
+                { isHidden: !showIntroduction, isDisplayed: showIntroduction }
+              )}
+            >
+              Did you know you can use the comma (,) to search using several
+              terms ?
+            </div>
           </label>
         </div>
       </div>

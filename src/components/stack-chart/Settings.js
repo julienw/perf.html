@@ -19,7 +19,7 @@ import {
   getSearchStrings,
 } from '../../reducers/url-state';
 import IdleSearchField from '../shared/IdleSearchField';
-import CompactableListWithRemoveButton from '../shared/CompactableListWithRemoveButton';
+import ListWithRemoveButton from '../shared/ListWithRemoveButton';
 
 import './Settings.css';
 
@@ -88,7 +88,6 @@ class StackChartSettings extends PureComponent {
       currentSearchString,
       searchStrings,
     } = this.props;
-    const { focused } = this.state;
     return (
       <div className="stackChartSettings">
         <ul className="stackChartSettingsList">
@@ -127,14 +126,8 @@ class StackChartSettings extends PureComponent {
               onBlur={this._onSearchFieldBlur}
               onFocus={this._onSearchFieldFocus}
             />
-            <CompactableListWithRemoveButton
+            <ListWithRemoveButton
               items={searchStrings}
-              compact={!focused}
-              showIntroduction={
-                currentSearchString.length > 0
-                  ? 'You can press enter to persist this search term.'
-                  : ''
-              }
               buttonTitle="Remove"
               onItemRemove={this._onSearchStringRemove}
             />
