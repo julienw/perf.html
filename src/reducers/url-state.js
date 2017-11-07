@@ -128,13 +128,6 @@ function callTreeSearchString(state: string = '', action: Action) {
   switch (action.type) {
     case 'CHANGE_CALL_TREE_SEARCH_STRING':
       return action.searchString;
-    case 'REMOVE_CALL_TREE_SEARCH_STRING_PART': {
-      const searchStringPart = action.searchStringPart;
-      return state
-        .split(',')
-        .filter(part => part.trim() !== searchStringPart)
-        .join(', ');
-    }
     default:
       return state;
   }

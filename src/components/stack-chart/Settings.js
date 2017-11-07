@@ -10,7 +10,6 @@ import {
   changeHidePlatformDetails,
   changeInvertCallstack,
   changeCallTreeSearchString,
-  removeCallTreeSearchStringPart,
 } from '../../actions/profile-view';
 import {
   getHidePlatformDetails,
@@ -19,7 +18,6 @@ import {
   getSearchStrings,
 } from '../../reducers/url-state';
 import IdleSearchField from '../shared/IdleSearchField';
-import ListWithRemoveButton from '../shared/ListWithRemoveButton';
 
 import './Settings.css';
 
@@ -31,7 +29,6 @@ type Props = {|
   +changeHidePlatformDetails: boolean => void,
   +changeInvertCallstack: boolean => void,
   +changeCallTreeSearchString: string => void,
-  +removeCallTreeSearchStringPart: string => void,
 |};
 
 class StackChartSettings extends PureComponent {
@@ -49,7 +46,6 @@ class StackChartSettings extends PureComponent {
     (this: any)._onSearchFieldIdleAfterChange = this._onSearchFieldIdleAfterChange.bind(
       this
     );
-    (this: any)._onSearchStringRemove = this._onSearchStringRemove.bind(this);
     (this: any)._onSearchFieldFocus = this._onSearchFieldFocus.bind(this);
     (this: any)._onSearchFieldBlur = this._onSearchFieldBlur.bind(this);
 
@@ -76,17 +72,11 @@ class StackChartSettings extends PureComponent {
     this.setState(() => ({ focused: false }));
   }
 
-  _onSearchStringRemove(searchStringIdx: number) {
-    const searchString = this.props.searchStrings[searchStringIdx];
-    this.props.removeCallTreeSearchStringPart(searchString);
-  }
-
   render() {
     const {
       hidePlatformDetails,
       invertCallstack,
       currentSearchString,
-      searchStrings,
     } = this.props;
     return (
       <div className="stackChartSettings">
@@ -126,11 +116,6 @@ class StackChartSettings extends PureComponent {
               onBlur={this._onSearchFieldBlur}
               onFocus={this._onSearchFieldFocus}
             />
-            <ListWithRemoveButton
-              items={searchStrings}
-              buttonTitle="Remove"
-              onItemRemove={this._onSearchStringRemove}
-            />
           </label>
         </div>
       </div>
@@ -149,6 +134,5 @@ export default connect(
     changeHidePlatformDetails,
     changeInvertCallstack,
     changeCallTreeSearchString,
-    removeCallTreeSearchStringPart,
   }
 )(StackChartSettings);

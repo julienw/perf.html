@@ -11,7 +11,6 @@ import {
   changeImplementationFilter,
   changeInvertCallstack,
   changeCallTreeSearchString,
-  removeCallTreeSearchStringPart,
 } from '../../actions/profile-view';
 import {
   getImplementationFilter,
@@ -20,7 +19,6 @@ import {
   getSearchStrings,
 } from '../../reducers/url-state';
 import IdleSearchField from '../shared/IdleSearchField';
-import ListWithRemoveButton from '../shared/ListWithRemoveButton';
 import { toValidImplementationFilter } from '../../profile-logic/profile-data';
 
 import './ProfileCallTreeSettings.css';
@@ -35,7 +33,6 @@ type Props = {|
   +changeImplementationFilter: typeof changeImplementationFilter,
   +changeInvertCallstack: typeof changeInvertCallstack,
   +changeCallTreeSearchString: typeof changeCallTreeSearchString,
-  +removeCallTreeSearchStringPart: typeof removeCallTreeSearchStringPart,
 |};
 
 class ProfileCallTreeSettings extends PureComponent {
@@ -53,7 +50,6 @@ class ProfileCallTreeSettings extends PureComponent {
     (this: any)._onSearchFieldIdleAfterChange = this._onSearchFieldIdleAfterChange.bind(
       this
     );
-    (this: any)._onSearchStringRemove = this._onSearchStringRemove.bind(this);
     (this: any)._onSearchFieldFocus = this._onSearchFieldFocus.bind(this);
     (this: any)._onSearchFieldBlur = this._onSearchFieldBlur.bind(this);
 
@@ -80,22 +76,8 @@ class ProfileCallTreeSettings extends PureComponent {
     this.setState({ searchFieldFocused: true });
   }
 
-  _onSearchFieldBlur(relatedTarget: Element | null) {
-    if (
-      relatedTarget &&
-      relatedTarget.matches('.profileCallTreeSettingsSearchbar *')
-    ) {
-      // Do not change the state if the blur's related target is still inside
-      // the search bar. The focus should move back automatically to the input
-      // box thanks to the <label> element's behavior.
-      return;
-    }
+  _onSearchFieldBlur() {
     this.setState(() => ({ searchFieldFocused: false }));
-  }
-
-  _onSearchStringRemove(searchStringIdx: number) {
-    const searchString = this.props.searchStrings[searchStringIdx];
-    this.props.removeCallTreeSearchStringPart(searchString);
   }
 
   render() {
@@ -106,7 +88,10 @@ class ProfileCallTreeSettings extends PureComponent {
       searchStrings,
     } = this.props;
     const { searchFieldFocused } = this.state;
-    const showIntroduction = searchFieldFocused && searchStrings.length === 1;
+    const showIntroduction =
+      searchFieldFocused &&
+      searchStrings.length &&
+      !currentSearchString.includes(',');
 
     return (
       <div className="profileCallTreeSettings">
@@ -149,13 +134,6 @@ class ProfileCallTreeSettings extends PureComponent {
               onBlur={this._onSearchFieldBlur}
               onFocus={this._onSearchFieldFocus}
             />
-            {searchStrings.length > 1 && searchFieldFocused
-              ? <ListWithRemoveButton
-                  items={searchStrings}
-                  buttonTitle="Remove"
-                  onItemRemove={this._onSearchStringRemove}
-                />
-              : null}
             <div
               className={classNames(
                 'profileCallTreeSettingsSearchIntroduction',
@@ -183,6 +161,5 @@ export default connect(
     changeImplementationFilter,
     changeInvertCallstack,
     changeCallTreeSearchString,
-    removeCallTreeSearchStringPart,
   }
 )(ProfileCallTreeSettings);

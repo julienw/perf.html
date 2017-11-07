@@ -76,23 +76,12 @@ export function showThread(threadIndex: ThreadIndex): Action {
   };
 }
 
-// ---- Search string related actions ----
 export function changeCallTreeSearchString(searchString: string): Action {
   return {
     type: 'CHANGE_CALL_TREE_SEARCH_STRING',
     searchString,
   };
 }
-
-export function removeCallTreeSearchStringPart(
-  searchStringPart: string
-): Action {
-  return {
-    type: 'REMOVE_CALL_TREE_SEARCH_STRING_PART',
-    searchStringPart,
-  };
-}
-// --- End of search string related actions ----
 
 export function changeExpandedCallNodes(
   threadIndex: ThreadIndex,
