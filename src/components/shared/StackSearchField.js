@@ -17,6 +17,7 @@ import {
 import './StackSearchField.css';
 
 type Props = {|
+  +className?: string,
   +currentSearchString: string,
   +searchStrings: string[],
   +changeCallTreeSearchString: typeof changeCallTreeSearchString,
@@ -51,18 +52,18 @@ class StackSearchField extends PureComponent {
   }
 
   render() {
-    const { currentSearchString, searchStrings } = this.props;
+    const { currentSearchString, searchStrings, className } = this.props;
     const { searchFieldFocused } = this.state;
     const showIntroduction =
       searchFieldFocused &&
       searchStrings.length &&
       !currentSearchString.includes(',');
     return (
-      <div className="profileCallTreeSettingsSearchbar">
-        <label className="profileCallTreeSettingsSearchbarLabel">
+      <div className={classNames('stackSearchField', className)}>
+        <label className="stackSearchFieldLabel">
           {'Filter stacks: '}
           <IdleSearchField
-            className="profileCallTreeSettingsSearchField"
+            className="stackSearchFieldSearchField"
             title="Only display stacks which contain a function whose name matches this substring"
             idlePeriod={200}
             defaultValue={currentSearchString}
@@ -71,7 +72,7 @@ class StackSearchField extends PureComponent {
             onFocus={this._onSearchFieldFocus}
           />
           <div
-            className={classNames('profileCallTreeSettingsSearchIntroduction', {
+            className={classNames('stackSearchFieldIntroduction', {
               isHidden: !showIntroduction,
               isDisplayed: showIntroduction,
             })}

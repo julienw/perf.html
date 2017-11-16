@@ -85,7 +85,7 @@ class ProfileCallTreeSettings extends PureComponent {
             </label>
           </li>
         </ul>
-        <StackSearchField />
+        <StackSearchField className="profileCallTreeSettingsSearchField" />
       </div>
     );
   }

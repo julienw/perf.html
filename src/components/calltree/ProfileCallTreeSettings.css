@@ -44,35 +44,3 @@
 .profileCallTreeSettingsCheckbox {
   margin: 0 5px;
 }
-
-.profileCallTreeSettingsSearchbar {
-  padding: 0 5px;
-}
-
-.profileCallTreeSettingsSearchField {
-  width: 300px;
-}
-
-.profileCallTreeSettingsSearchIntroduction {
-  transform: translate(2px, -2px);
-  padding: 0 5px;
-
-  box-shadow: 0 1px 2px 1px rgba(12, 12, 13, .10); /* This is grey-90 with 10% opacity, according to the photon design document */
-  background-color: white;
-  color: var(--grey-50);
-  font-size: 0.9em;
-  line-height: 2;
-}
-
-.profileCallTreeSettingsSearchIntroduction.isDisplayed {
-  transition: transform 150ms var(--animation-curve), opacity 150ms ease-in-out;
-}
-
-.profileCallTreeSettingsSearchIntroduction.isHidden {
-  opacity: 0;
-  transform: translateY(-100%);
-
-  /* steps(1) is to wait until the end for the transform to happen */
-  transition: transform 150ms steps(1), opacity 150ms ease-in-out;
-}
-
