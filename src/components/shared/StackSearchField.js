@@ -63,7 +63,7 @@ class StackSearchField extends PureComponent {
         <label className="stackSearchFieldLabel">
           {'Filter stacks: '}
           <IdleSearchField
-            className="stackSearchFieldSearchField"
+            className="stackSearchFieldInput"
             title="Only display stacks which contain a function whose name matches this substring"
             idlePeriod={200}
             defaultValue={currentSearchString}
