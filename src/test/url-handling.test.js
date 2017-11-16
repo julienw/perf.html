@@ -133,35 +133,19 @@ describe('threadOrder and hiddenThreads', function() {
 });
 
 describe('search strings', function() {
-  it('properly handles the current search string', function() {
-    const { getState } = _getStoreWithURL({ search: '?currentSearch=string' });
-    expect(urlStateReducers.getCurrentSearchString(getState())).toBe('string');
-    expect(urlStateReducers.getSearchStrings(getState())).toEqual([]);
-  });
-
   it('properly handles the search string stacks with 1 item', function() {
     const { getState } = _getStoreWithURL({ search: '?search=string' });
-    expect(urlStateReducers.getCurrentSearchString(getState())).toBe('');
+    expect(urlStateReducers.getCurrentSearchString(getState())).toBe('string');
     expect(urlStateReducers.getSearchStrings(getState())).toEqual(['string']);
   });
 
   it('properly handles the search string stacks with several items', function() {
     const { getState } = _getStoreWithURL({
-      search: '?search=string&search=foo&search=bar',
+      search: '?search=string,foo,%20bar',
     });
-    expect(urlStateReducers.getCurrentSearchString(getState())).toBe('');
-    expect(urlStateReducers.getSearchStrings(getState())).toEqual([
-      'string',
-      'foo',
-      'bar',
-    ]);
-  });
-
-  it('properly handles both current search string and the search string stacks', function() {
-    const { getState } = _getStoreWithURL({
-      search: '?search=string&search=foo&search=bar&currentSearch=hello',
-    });
-    expect(urlStateReducers.getCurrentSearchString(getState())).toBe('hello');
+    expect(urlStateReducers.getCurrentSearchString(getState())).toBe(
+      'string,foo, bar'
+    );
     expect(urlStateReducers.getSearchStrings(getState())).toEqual([
       'string',
       'foo',
@@ -227,20 +211,6 @@ describe('url upgrading', function() {
         v: false,
       });
       expect(urlStateReducers.getSelectedTab(getState())).toBe('marker-table');
-    });
-  });
-
-  describe('version 3: upgrade search strings', function() {
-    it('correctly handles the search string', function() {
-      const { getState } = _getStoreWithURL({
-        pathname: '/public/e71ce9584da34298627fb66ac7f2f245ba5edbf5/calltree/',
-        search: `?search=string`,
-        v: 2,
-      });
-
-      const state = getState();
-      expect(urlStateReducers.getSearchStrings(state)).toEqual([]);
-      expect(urlStateReducers.getCurrentSearchString(state)).toBe('string');
     });
   });
 

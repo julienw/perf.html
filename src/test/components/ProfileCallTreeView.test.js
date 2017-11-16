@@ -10,10 +10,7 @@ import renderer from 'react-test-renderer';
 import { Provider } from 'react-redux';
 import { storeWithProfile } from '../fixtures/stores';
 import { getProfileFromTextSamples } from '../fixtures/profiles/make-profile';
-import {
-  changeCallTreeSearchString,
-  removeCallTreeSearchStringPart,
-} from '../../actions/profile-view';
+import { changeCallTreeSearchString } from '../../actions/profile-view';
 import { getBoundingBox } from '../fixtures/utils';
 
 describe('calltree/ProfileCallTreeView', function() {
@@ -82,7 +79,7 @@ describe('calltree/ProfileCallTreeView', function() {
     store.dispatch(changeCallTreeSearchString('C, F,E'));
     expect(calltree).toMatchSnapshot();
 
-    store.dispatch(removeCallTreeSearchStringPart('F'));
+    store.dispatch(changeCallTreeSearchString(' C , E   '));
     expect(calltree).toMatchSnapshot();
   });
 });
