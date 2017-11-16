@@ -35,7 +35,6 @@ class IdleSearchField extends PureComponent {
     (this: any)._onSearchFieldFocus = this._onSearchFieldFocus.bind(this);
     (this: any)._onSearchFieldBlur = this._onSearchFieldBlur.bind(this);
     (this: any)._onClearButtonClick = this._onClearButtonClick.bind(this);
-    (this: any)._onFormSubmit = this._onFormSubmit.bind(this);
     (this: any)._onTimeout = this._onTimeout.bind(this);
     this._timeout = 0;
     this.state = {
@@ -105,25 +104,6 @@ class IdleSearchField extends PureComponent {
     }
   }
 
-  _onFormSubmit(e: SyntheticEvent & { currentTarget: HTMLElement }) {
-    e.preventDefault();
-
-    // 1. Notify the current value
-    clearTimeout(this._timeout);
-    this._timeout = 0;
-    this._notifyIfChanged(this.state.value);
-
-    // 2. Notify the user wants to persist this value
-    const { onSubmit } = this.props;
-    if (onSubmit) {
-      onSubmit();
-    }
-
-    // 3. Update our local state
-    this.setState({ value: '' });
-    this._notifyIfChanged('');
-  }
-
   componentWillReceiveProps(nextProps: Props) {
     if (nextProps.defaultValue !== this.props.defaultValue) {
       this._notifyIfChanged(nextProps.defaultValue || '');
@@ -138,7 +118,7 @@ class IdleSearchField extends PureComponent {
     return (
       <form
         className={classNames('idleSearchField', className)}
-        onSubmit={this._onFormSubmit}
+        onSubmit={e => e.preventDefault()}
       >
         <input
           type="search"
