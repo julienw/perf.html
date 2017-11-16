@@ -19,15 +19,13 @@ type Props = {|
   +title: ?string,
 |};
 
-class IdleSearchField extends PureComponent {
+type State = {
+  value: string,
+};
+
+class IdleSearchField extends PureComponent<Props, State> {
   _timeout: number;
   _previouslyNotifiedValue: string;
-
-  props: Props;
-
-  state: {
-    value: string,
-  };
 
   constructor(props: Props) {
     super(props);
@@ -43,7 +41,7 @@ class IdleSearchField extends PureComponent {
     this._previouslyNotifiedValue = this.state.value;
   }
 
-  _onSearchFieldFocus(e: SyntheticEvent & { currentTarget: HTMLInputElement }) {
+  _onSearchFieldFocus(e: SyntheticFocusEvent<HTMLInputElement>) {
     e.currentTarget.select();
 
     if (this.props.onFocus) {
@@ -57,9 +55,7 @@ class IdleSearchField extends PureComponent {
     }
   }
 
-  _onSearchFieldChange(
-    e: SyntheticEvent & { currentTarget: HTMLInputElement }
-  ) {
+  _onSearchFieldChange(e: SyntheticEvent<HTMLInputElement>) {
     this.setState({
       value: e.currentTarget.value,
     });
@@ -91,10 +87,7 @@ class IdleSearchField extends PureComponent {
   }
 
   _onClearButtonFocus(
-    e: SyntheticEvent & {
-      relatedTarget: HTMLElement,
-      currentTarget: HTMLElement,
-    }
+    e: SyntheticEvent<HTMLElement> & { relatedTarget: HTMLElement }
   ) {
     // prevent the focus on the clear button
     if (e.relatedTarget) {

@@ -4,7 +4,7 @@
 
 // @flow
 
-import React, { PureComponent } from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import escapeStringRegexp from 'escape-string-regexp';
@@ -22,7 +22,7 @@ type RegExpResult = null | ({ index: number, input: string } & string[]);
 export type Column = {
   propName: string,
   title: string,
-  component?: ReactClass<*>,
+  component?: React.ComponentType<*>,
 };
 
 type TreeViewHeaderProps = {
@@ -85,19 +85,19 @@ type TreeViewRowFixedColumnsProps = {
   columns: Column[],
   index: number,
   selected: boolean,
-  onClick: (IndexIntoCallNodeTable, MouseEvent) => mixed,
+  onClick: (IndexIntoCallNodeTable, SyntheticMouseEvent<>) => mixed,
   highlightStrings?: string[],
 };
 
-class TreeViewRowFixedColumns extends PureComponent {
-  props: TreeViewRowFixedColumnsProps;
-
+class TreeViewRowFixedColumns extends React.PureComponent<
+  TreeViewRowFixedColumnsProps
+> {
   constructor(props: TreeViewRowFixedColumnsProps) {
     super(props);
     (this: any)._onClick = this._onClick.bind(this);
   }
 
-  _onClick(event: MouseEvent) {
+  _onClick(event: SyntheticMouseEvent<>) {
     const { nodeId, onClick } = this.props;
     onClick(nodeId, event);
   }
@@ -148,22 +148,22 @@ type TreeViewRowScrolledColumnsProps = {
   isExpanded: boolean,
   selected: boolean,
   onToggle: (IndexIntoCallNodeTable, boolean, boolean) => mixed,
-  onClick: (IndexIntoCallNodeTable, MouseEvent) => mixed,
+  onClick: (IndexIntoCallNodeTable, SyntheticMouseEvent<>) => mixed,
   onAppendageButtonClick:
     | ((IndexIntoCallNodeTable | null, string) => mixed)
     | null,
   highlightStrings?: string[],
 };
 
-class TreeViewRowScrolledColumns extends PureComponent {
-  props: TreeViewRowScrolledColumnsProps;
-
+class TreeViewRowScrolledColumns extends React.PureComponent<
+  TreeViewRowScrolledColumnsProps
+> {
   constructor(props: TreeViewRowScrolledColumnsProps) {
     super(props);
     (this: any)._onClick = this._onClick.bind(this);
   }
 
-  _onClick(event: MouseEvent & { target: Element }) {
+  _onClick(event: SyntheticMouseEvent<Element>) {
     const {
       nodeId,
       isExpanded,
@@ -171,13 +171,15 @@ class TreeViewRowScrolledColumns extends PureComponent {
       onClick,
       onAppendageButtonClick,
     } = this.props;
-    if (event.target.classList.contains('treeRowToggleButton')) {
+    if (event.currentTarget.classList.contains('treeRowToggleButton')) {
       onToggle(nodeId, !isExpanded, event.altKey === true);
-    } else if (event.target.classList.contains('treeViewRowAppendageButton')) {
+    } else if (
+      event.currentTarget.classList.contains('treeViewRowAppendageButton')
+    ) {
       if (onAppendageButtonClick) {
         onAppendageButtonClick(
           nodeId,
-          event.target.getAttribute('data-appendage-button-name') || ''
+          event.currentTarget.getAttribute('data-appendage-button-name') || ''
         );
       }
     } else {
@@ -265,7 +267,7 @@ type TreeViewProps = {|
   appendageButtons: string[],
   disableOverscan: boolean,
   icons: IconWithClassName[],
-  contextMenu?: React$Element<*>,
+  contextMenu?: React.Element<any>,
   contextMenuId?: string,
   onAppendageButtonClick:
     | ((IndexIntoCallNodeTable | null, string) => mixed)
@@ -273,8 +275,7 @@ type TreeViewProps = {|
   onSelectionChange: IndexIntoCallNodeTable => mixed,
 |};
 
-class TreeView extends PureComponent {
-  props: TreeViewProps;
+class TreeView extends React.PureComponent<TreeViewProps> {
   _specialItems: (IndexIntoCallNodeTable | null)[];
   _visibleRows: IndexIntoCallNodeTable[];
   _list: VirtualList | null;
@@ -432,7 +433,7 @@ class TreeView extends PureComponent {
     this.props.onSelectionChange(nodeId);
   }
 
-  _onRowClicked(nodeId: IndexIntoCallNodeTable, event: MouseEvent) {
+  _onRowClicked(nodeId: IndexIntoCallNodeTable, event: SyntheticMouseEvent<>) {
     this._select(nodeId);
     if (event.detail === 2 && event.button === 0) {
       // double click

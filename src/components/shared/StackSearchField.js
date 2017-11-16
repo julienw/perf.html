@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // @flow
-import React, { PureComponent } from 'react';
+import * as React from 'react';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
 
@@ -24,10 +24,7 @@ type Props = {|
 |};
 type State = {| searchFieldFocused: boolean |};
 
-class StackSearchField extends PureComponent {
-  props: Props;
-  state: State;
-
+class StackSearchField extends React.PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
     (this: any)._onSearchFieldIdleAfterChange = this._onSearchFieldIdleAfterChange.bind(
