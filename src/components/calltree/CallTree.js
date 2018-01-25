@@ -50,7 +50,7 @@ type StateProps = {|
   +tree: CallTree,
   +callNodeInfo: CallNodeInfo,
   +selectedCallNodeIndex: IndexIntoCallNodeTable | null,
-  +expandedCallNodeIndexes: Array<IndexIntoCallNodeTable>,
+  +expandedCallNodeIndexes: Set<IndexIntoCallNodeTable>,
   +searchStringsRegExp: RegExp | null,
   +disableOverscan: boolean,
   +invertCallstack: boolean,
@@ -132,7 +132,7 @@ class CallTreeComponent extends PureComponent<Props> {
   }
 
   _onExpandedCallNodesChange(
-    newExpandedCallNodeIndexes: IndexIntoCallNodeTable[]
+    newExpandedCallNodeIndexes: Set<IndexIntoCallNodeTable>
   ) {
     const { threadIndex, changeExpandedCallNodes } = this.props;
     changeExpandedCallNodes(threadIndex, newExpandedCallNodeIndexes);
@@ -162,17 +162,17 @@ class CallTreeComponent extends PureComponent<Props> {
     // Expand the heaviest callstack up to a certain depth and select the frame
     // at that depth.
     const { tree, expandedCallNodeIndexes } = this.props;
-    const newExpandedCallNodeIndexes = expandedCallNodeIndexes.slice();
+    const newExpandedCallNodeIndexes = new Set(expandedCallNodeIndexes);
     const maxInterestingDepth = 17; // scientifically determined
     let currentCallNodeIndex = tree.getRoots()[0];
-    newExpandedCallNodeIndexes.push(currentCallNodeIndex);
+    newExpandedCallNodeIndexes.add(currentCallNodeIndex);
     for (let i = 0; i < maxInterestingDepth; i++) {
       const children = tree.getChildren(currentCallNodeIndex);
       if (children.length === 0) {
         break;
       }
       currentCallNodeIndex = children[0];
-      newExpandedCallNodeIndexes.push(currentCallNodeIndex);
+      newExpandedCallNodeIndexes.add(currentCallNodeIndex);
     }
     this._onExpandedCallNodesChange(newExpandedCallNodeIndexes);
     this._onSelectedCallNodeChange(currentCallNodeIndex);

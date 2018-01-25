@@ -25,7 +25,7 @@ export type RequestedLib = { debugName: string, breakpadId: string };
 export type SymbolicationStatus = 'DONE' | 'SYMBOLICATING';
 export type ThreadViewOptions = {
   selectedCallNodeIndex: IndexIntoCallNodeTable | null,
-  expandedCallNodeIndexes: Array<IndexIntoCallNodeTable>,
+  expandedCallNodeIndexes: Set<IndexIntoCallNodeTable>,
   selectedMarker: IndexIntoMarkersTable | -1,
 };
 export type ProfileViewState = {

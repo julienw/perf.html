@@ -164,7 +164,7 @@ class MarkerTable extends PureComponent<Props> {
     { propName: 'category', title: 'Category' },
   ];
   _mainColumn = { propName: 'name', title: '' };
-  _expandedNodeIds: Array<IndexIntoMarkersTable> = [];
+  _expandedNodeIds: Set<IndexIntoMarkersTable> = new Set();
   _onExpandedNodeIdsChange = () => {};
   _treeView: ?TreeView<IndexIntoMarkersTable, MarkerDisplayData>;
   _takeTreeViewRef = treeView => (this._treeView = treeView);

@@ -295,9 +295,9 @@ type TreeViewProps<NodeIndex, DisplayData> = {|
   +fixedColumns: Column[],
   +mainColumn: Column,
   +tree: Tree<NodeIndex, DisplayData>,
-  +expandedNodeIds: Array<NodeIndex>,
+  +expandedNodeIds: Set<NodeIndex>,
   +selectedNodeId: NodeIndex | null,
-  +onExpandedNodesChange: (Array<NodeIndex | null>) => mixed,
+  +onExpandedNodesChange: (Set<NodeIndex>) => mixed,
   +highlightRegExp?: RegExp | null,
   +appendageColumn?: Column,
   +appendageButtons?: string[],
@@ -380,7 +380,7 @@ class TreeView<
       );
     }
     const canBeExpanded = tree.hasChildren(nodeId);
-    const isExpanded = expandedNodeIds.includes(nodeId);
+    const isExpanded = expandedNodeIds.has(nodeId);
     return (
       <TreeViewRowScrolledColumns
         displayData={displayData}
@@ -408,7 +408,7 @@ class TreeView<
     depth: number
   ) {
     arr.push(nodeId);
-    if (!props.expandedNodeIds.includes(nodeId)) {
+    if (!props.expandedNodeIds.has(nodeId)) {
       return;
     }
     const children = props.tree.getChildren(nodeId);
@@ -429,7 +429,7 @@ class TreeView<
   }
 
   _isCollapsed(nodeId: NodeIndex): boolean {
-    return !this.props.expandedNodeIds.includes(nodeId);
+    return !this.props.expandedNodeIds.has(nodeId);
   }
 
   _toggle(
@@ -448,7 +448,7 @@ class TreeView<
     } else {
       newSet.delete(nodeId);
     }
-    this.props.onExpandedNodesChange(Array.from(newSet.values()));
+    this.props.onExpandedNodesChange(newSet);
   }
 
   _toggleAll(

@@ -224,13 +224,13 @@ export function expandAllCallNodeDescendants(
       }
     });
 
-    dispatch(changeExpandedCallNodes(threadIndex, [...descendants]));
+    dispatch(changeExpandedCallNodes(threadIndex, descendants));
   };
 }
 
 export function changeExpandedCallNodes(
   threadIndex: ThreadIndex,
-  expandedCallNodeIndexes: IndexIntoCallNodeTable[]
+  expandedCallNodeIndexes: Set<IndexIntoCallNodeTable>
 ): Action {
   return {
     type: 'CHANGE_EXPANDED_CALL_NODES',
