@@ -13,7 +13,7 @@ import type {
 } from './actions';
 import type { Milliseconds, StartEndRange } from './units';
 import type { IndexIntoMarkersTable, Profile, ThreadIndex } from './profile';
-import type { CallNodePath } from './profile-derived';
+import type { IndexIntoCallNodeTable } from './profile-derived';
 import type { Attempt } from '../utils/errors';
 import type { GetLabel } from '../profile-logic/labeling-strategies';
 import type { GetCategory } from '../profile-logic/color-categories';
@@ -24,8 +24,8 @@ export type Reducer<T> = (T, Action) => T;
 export type RequestedLib = { debugName: string, breakpadId: string };
 export type SymbolicationStatus = 'DONE' | 'SYMBOLICATING';
 export type ThreadViewOptions = {
-  selectedCallNodePath: CallNodePath,
-  expandedCallNodePaths: Array<CallNodePath>,
+  selectedCallNodeIndex: IndexIntoCallNodeTable | null,
+  expandedCallNodeIndexes: Array<IndexIntoCallNodeTable>,
   selectedMarker: IndexIntoMarkersTable | -1,
 };
 export type ProfileViewState = {

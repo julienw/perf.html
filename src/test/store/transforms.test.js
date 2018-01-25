@@ -11,7 +11,7 @@ import {
   popTransformsFromStack,
   changeInvertCallstack,
   changeImplementationFilter,
-  changeSelectedCallNode,
+  changeSelectedCallNodeByPath,
 } from '../../actions/profile-view';
 import { selectedThreadSelectors } from '../../reducers/profile-view';
 
@@ -680,7 +680,7 @@ describe('"collapse-resource" transform', function() {
       // This transform requires a valid thread, unlike many of the others.
       const { dispatch, getState } = storeWithProfile(profile);
       dispatch(
-        changeSelectedCallNode(
+        changeSelectedCallNodeByPath(
           threadIndex,
           ['A', 'B:firefox', 'C:firefox', 'D'].map(name =>
             collapsedFuncNames.indexOf(name)
@@ -791,7 +791,7 @@ describe('"collapse-resource" transform', function() {
       const { dispatch, getState } = storeWithProfile(profile);
 
       dispatch(
-        changeSelectedCallNode(
+        changeSelectedCallNodeByPath(
           threadIndex,
           ['B.cpp:firefox', 'D.cpp:firefox'].map(name =>
             collapsedFuncNames.indexOf(name)
@@ -875,7 +875,7 @@ describe('"collapse-function-subtree" transform', function() {
   it('can update apply the transform to the selected CallNodePaths', function() {
     const { dispatch, getState } = storeWithProfile(profile);
     dispatch(
-      changeSelectedCallNode(
+      changeSelectedCallNodeByPath(
         threadIndex,
         ['A', 'B', 'C', 'D', 'E'].map(name => funcNames.indexOf(name))
       )
@@ -891,7 +891,7 @@ describe('"collapse-function-subtree" transform', function() {
     const toIds = (paths: Array<string[]>) =>
       paths.map(path => path.map(name => funcNames.indexOf(name)));
     dispatch(
-      changeSelectedCallNode(
+      changeSelectedCallNodeByPath(
         threadIndex,
         ['A', 'B', 'C', 'D', 'E'].map(name => funcNames.indexOf(name))
       )
@@ -987,7 +987,7 @@ describe('"collapse-direct-recursion" transform', function() {
       // This transform requires a valid thread, unlike many of the others.
       const { dispatch, getState } = storeWithProfile(profile);
       dispatch(
-        changeSelectedCallNode(
+        changeSelectedCallNodeByPath(
           threadIndex,
           ['A', 'B', 'B', 'B', 'C'].map(name => funcNames.indexOf(name))
         )
@@ -1091,7 +1091,7 @@ describe('expanded and selected CallNodePaths', function() {
   it('can select a path and expand the nodes to that path', function() {
     const { dispatch, getState } = storeWithProfile(profile);
     // This opens expands the call nodes up to this point.
-    dispatch(changeSelectedCallNode(threadIndex, selectedCallNodePath));
+    dispatch(changeSelectedCallNodeByPath(threadIndex, selectedCallNodePath));
     expect(selectedThreadSelectors.getSelectedCallNodePath(getState())).toEqual(
       [A, B, C, D]
     );
@@ -1109,7 +1109,7 @@ describe('expanded and selected CallNodePaths', function() {
   it('can update call node references for focusing a subtree', function() {
     const { dispatch, getState } = storeWithProfile(profile);
     // This opens expands the call nodes up to this point.
-    dispatch(changeSelectedCallNode(threadIndex, [A, B, C, D]));
+    dispatch(changeSelectedCallNodeByPath(threadIndex, [A, B, C, D]));
     dispatch(
       addTransformToStack(threadIndex, {
         type: 'focus-subtree',
@@ -1134,7 +1134,7 @@ describe('expanded and selected CallNodePaths', function() {
   it('can update call node references for merging a node', function() {
     const { dispatch, getState } = storeWithProfile(profile);
     // This opens expands the call nodes up to this point.
-    dispatch(changeSelectedCallNode(threadIndex, [A, B, C, D]));
+    dispatch(changeSelectedCallNodeByPath(threadIndex, [A, B, C, D]));
     dispatch(
       addTransformToStack(threadIndex, {
         type: 'merge-call-node',
@@ -1180,7 +1180,7 @@ describe('expanded and selected CallNodePaths on inverted trees', function() {
     const { dispatch, getState } = storeWithProfile(profile);
     // This opens expands the call nodes up to this point.
     dispatch(changeInvertCallstack(true));
-    dispatch(changeSelectedCallNode(threadIndex, selectedCallNodePath));
+    dispatch(changeSelectedCallNodeByPath(threadIndex, selectedCallNodePath));
 
     expect(selectedThreadSelectors.getSelectedCallNodePath(getState())).toEqual(
       [Z, Y, X, B]
@@ -1199,7 +1199,7 @@ describe('expanded and selected CallNodePaths on inverted trees', function() {
     const { dispatch, getState } = storeWithProfile(profile);
     // This opens expands the call nodes up to this point.
     dispatch(changeInvertCallstack(true));
-    dispatch(changeSelectedCallNode(threadIndex, selectedCallNodePath));
+    dispatch(changeSelectedCallNodeByPath(threadIndex, selectedCallNodePath));
     dispatch(
       addTransformToStack(threadIndex, {
         type: 'focus-subtree',
@@ -1225,7 +1225,7 @@ describe('expanded and selected CallNodePaths on inverted trees', function() {
     const { dispatch, getState } = storeWithProfile(profile);
     // This opens expands the call nodes up to this point.
     dispatch(changeInvertCallstack(true));
-    dispatch(changeSelectedCallNode(threadIndex, selectedCallNodePath));
+    dispatch(changeSelectedCallNodeByPath(threadIndex, selectedCallNodePath));
     dispatch(
       addTransformToStack(threadIndex, {
         type: 'merge-call-node',

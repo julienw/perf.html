@@ -16,7 +16,7 @@ import {
 } from '../reducers/url-state';
 import {
   getFriendlyThreadName,
-  getCallNodePath,
+  getCallNodeFromPath,
 } from '../profile-logic/profile-data';
 import { sendAnalytics } from '../utils/analytics';
 
@@ -25,7 +25,6 @@ import type { Action, ThunkAction } from '../types/store';
 import type { ThreadIndex, IndexIntoMarkersTable } from '../types/profile';
 import type {
   CallNodePath,
-  CallNodeInfo,
   IndexIntoCallNodeTable,
 } from '../types/profile-derived';
 import type { Transform } from '../types/transforms';
@@ -37,12 +36,49 @@ import type { Transform } from '../types/transforms';
  */
 export function changeSelectedCallNode(
   threadIndex: ThreadIndex,
+  selectedCallNodeIndex: IndexIntoCallNodeTable | null
+): ThunkAction<void> {
+  return (dispatch, getState) => {
+    const { callNodeTable } = selectorsForThread(threadIndex).getCallNodeInfo(
+      getState()
+    );
+    const callNodeAncestors = [];
+
+    if (selectedCallNodeIndex !== null) {
+      for (
+        // Start with the first prefix
+        let callNodeIndex = callNodeTable.prefix[selectedCallNodeIndex];
+        // Continue until no more are found
+        callNodeIndex !== -1;
+        // Keep on searching.
+        callNodeIndex = callNodeTable.prefix[callNodeIndex]
+      ) {
+        callNodeAncestors.push(callNodeIndex);
+      }
+    }
+
+    dispatch({
+      type: 'CHANGE_SELECTED_CALL_NODE',
+      selectedCallNodeIndex,
+      threadIndex,
+      callNodeAncestors,
+    });
+  };
+}
+
+export function changeSelectedCallNodeByPath(
+  threadIndex: ThreadIndex,
   selectedCallNodePath: CallNodePath
-): Action {
-  return {
-    type: 'CHANGE_SELECTED_CALL_NODE',
-    selectedCallNodePath,
-    threadIndex,
+): ThunkAction<void> {
+  return (dispatch, getState) => {
+    const { callNodeTable } = selectorsForThread(threadIndex).getCallNodeInfo(
+      getState()
+    );
+    const selectedCallNodeIndex = getCallNodeFromPath(
+      selectedCallNodePath,
+      callNodeTable
+    );
+    dispatch(changeSelectedCallNode(threadIndex, selectedCallNodeIndex));
   };
 }
 
@@ -170,8 +206,7 @@ export function changeCallTreeSearchString(searchString: string): Action {
 
 export function expandAllCallNodeDescendants(
   threadIndex: ThreadIndex,
-  callNodeIndex: IndexIntoCallNodeTable,
-  callNodeInfo: CallNodeInfo
+  callNodeIndex: IndexIntoCallNodeTable
 ): ThunkAction<void> {
   return (dispatch, getState) => {
     const expandedCallNodeIndexes = selectedThreadSelectors.getExpandedCallNodeIndexes(
@@ -189,21 +224,18 @@ export function expandAllCallNodeDescendants(
       }
     });
 
-    const expandedCallNodePaths = [...descendants].map(callNodeIndex =>
-      getCallNodePath(callNodeIndex, callNodeInfo.callNodeTable)
-    );
-    dispatch(changeExpandedCallNodes(threadIndex, expandedCallNodePaths));
+    dispatch(changeExpandedCallNodes(threadIndex, [...descendants]));
   };
 }
 
 export function changeExpandedCallNodes(
   threadIndex: ThreadIndex,
-  expandedCallNodePaths: Array<CallNodePath>
+  expandedCallNodeIndexes: IndexIntoCallNodeTable[]
 ): Action {
   return {
     type: 'CHANGE_EXPANDED_CALL_NODES',
     threadIndex,
-    expandedCallNodePaths,
+    expandedCallNodeIndexes,
   };
 }
 

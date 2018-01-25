@@ -106,8 +106,8 @@ function viewOptionsPerThread(state: ThreadViewOptions[] = [], action: Action) {
     case 'RECEIVE_PROFILE_FROM_URL':
     case 'RECEIVE_PROFILE_FROM_FILE':
       return action.profile.threads.map(() => ({
-        selectedCallNodePath: [],
-        expandedCallNodePaths: [],
+        selectedCallNodeIndex: null,
+        expandedCallNodeIndexes: [],
         selectedMarker: -1,
       }));
     case 'COALESCED_FUNCTIONS_UPDATE': {
@@ -139,18 +139,22 @@ function viewOptionsPerThread(state: ThreadViewOptions[] = [], action: Action) {
       });
     }
     case 'CHANGE_SELECTED_CALL_NODE': {
-      const { selectedCallNodePath, threadIndex } = action;
-      const expandedCallNodePaths = state[
+      const { selectedCallNodeIndex, callNodeAncestors, threadIndex } = action;
+      const expandedCallNodeIndexes = state[
         threadIndex
-      ].expandedCallNodePaths.slice();
-      for (let i = 1; i < selectedCallNodePath.length; i++) {
-        expandedCallNodePaths.push(selectedCallNodePath.slice(0, i));
+      ].expandedCallNodeIndexes.slice();
+
+      for (let i = 0; i < callNodeAncestors.length; i++) {
+        const ancestorIndex = callNodeAncestors[i];
+        if (!expandedCallNodeIndexes.includes(ancestorIndex)) {
+          expandedCallNodeIndexes.push(ancestorIndex);
+        }
       }
       return [
         ...state.slice(0, threadIndex),
         Object.assign({}, state[threadIndex], {
-          selectedCallNodePath,
-          expandedCallNodePaths,
+          selectedCallNodeIndex,
+          expandedCallNodeIndexes,
         }),
         ...state.slice(threadIndex + 1),
       ];
@@ -181,10 +185,10 @@ function viewOptionsPerThread(state: ThreadViewOptions[] = [], action: Action) {
       });
     }
     case 'CHANGE_EXPANDED_CALL_NODES': {
-      const { threadIndex, expandedCallNodePaths } = action;
+      const { threadIndex, expandedCallNodeIndexes } = action;
       return [
         ...state.slice(0, threadIndex),
-        Object.assign({}, state[threadIndex], { expandedCallNodePaths }),
+        Object.assign({}, state[threadIndex], { expandedCallNodeIndexes }),
         ...state.slice(threadIndex + 1),
       ];
     }
@@ -478,7 +482,7 @@ export type SelectorsForThread = {
   getSelectedCallNodePath: State => CallNodePath,
   getSelectedCallNodeIndex: State => IndexIntoCallNodeTable | null,
   getExpandedCallNodePaths: State => CallNodePath[],
-  getExpandedCallNodeIndexes: State => Array<IndexIntoCallNodeTable | null>,
+  getExpandedCallNodeIndexes: State => Array<IndexIntoCallNodeTable>,
   getCallTree: State => CallTree.CallTree,
   getFilteredThreadForStackChart: State => Thread,
   getCallNodeInfoOfFilteredThreadForStackChart: State => CallNodeInfo,
@@ -685,35 +689,30 @@ export const selectorsForThread = (
     );
     const getSelectedCallNodePath = createSelector(
       getViewOptions,
-      (threadViewOptions): CallNodePath =>
-        threadViewOptions.selectedCallNodePath
+      getCallNodeInfo,
+      (threadViewOptions, { callNodeTable }): CallNodePath =>
+        ProfileData.getCallNodePath(
+          threadViewOptions.selectedCallNodeIndex,
+          callNodeTable
+        )
     );
     const getSelectedCallNodeIndex = createSelector(
-      getCallNodeInfo,
-      getSelectedCallNodePath,
-      (callNodeInfo, callNodePath): IndexIntoCallNodeTable | null => {
-        return ProfileData.getCallNodeFromPath(
-          callNodePath,
-          callNodeInfo.callNodeTable
-        );
-      }
-    );
-    const getExpandedCallNodePaths = createSelector(
       getViewOptions,
-      (threadViewOptions): Array<CallNodePath> =>
-        threadViewOptions.expandedCallNodePaths
+      (threadViewOptions): IndexIntoCallNodeTable | null =>
+        threadViewOptions.selectedCallNodeIndex
     );
     const getExpandedCallNodeIndexes = createSelector(
+      getViewOptions,
+      (threadViewOptions): IndexIntoCallNodeTable[] =>
+        threadViewOptions.expandedCallNodeIndexes
+    );
+    const getExpandedCallNodePaths = createSelector(
+      getExpandedCallNodeIndexes,
       getCallNodeInfo,
-      getExpandedCallNodePaths,
-      (callNodeInfo, callNodePaths): (IndexIntoCallNodeTable | null)[] => {
-        return callNodePaths.map(callNodePath =>
-          ProfileData.getCallNodeFromPath(
-            callNodePath,
-            callNodeInfo.callNodeTable
-          )
-        );
-      }
+      (expandedCallNodeIndexes, { callNodeTable }): Array<CallNodePath> =>
+        expandedCallNodeIndexes.map(callNodeIndex =>
+          ProfileData.getCallNodePath(callNodeIndex, callNodeTable)
+        )
     );
     const getCallTree = createSelector(
       getRangeSelectionFilteredThread,

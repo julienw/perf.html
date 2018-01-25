@@ -258,7 +258,6 @@ class ProfileCallTreeContextMenu extends PureComponent<Props> {
       expandAllCallNodeDescendants,
       threadIndex,
       selectedCallNodeIndex,
-      callNodeInfo,
     } = this.props;
     if (selectedCallNodeIndex === null) {
       throw new Error(
@@ -266,11 +265,7 @@ class ProfileCallTreeContextMenu extends PureComponent<Props> {
       );
     }
 
-    expandAllCallNodeDescendants(
-      threadIndex,
-      selectedCallNodeIndex,
-      callNodeInfo
-    );
+    expandAllCallNodeDescendants(threadIndex, selectedCallNodeIndex);
   }
 
   getNameForSelectedResource(): string | null {

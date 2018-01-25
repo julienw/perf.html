@@ -29,7 +29,9 @@ describe('call node paths on implementation filter change', function() {
 
   it('starts with combined CallNodePaths', function() {
     const { dispatch, getState } = storeWithProfile(profile);
-    dispatch(ProfileView.changeSelectedCallNode(threadIndex, [A, B, C, D, E]));
+    dispatch(
+      ProfileView.changeSelectedCallNodeByPath(threadIndex, [A, B, C, D, E])
+    );
     expect(selectedThreadSelectors.getSelectedCallNodePath(getState())).toEqual(
       [A, B, C, D, E]
     );
@@ -47,7 +49,7 @@ describe('call node paths on implementation filter change', function() {
   it('starts with js CallNodePaths', function() {
     const { dispatch, getState } = storeWithProfile(profile);
     dispatch(ProfileView.changeImplementationFilter('js'));
-    dispatch(ProfileView.changeSelectedCallNode(threadIndex, [B, D, E]));
+    dispatch(ProfileView.changeSelectedCallNodeByPath(threadIndex, [B, D, E]));
     expect(selectedThreadSelectors.getSelectedCallNodePath(getState())).toEqual(
       [B, D, E]
     );
@@ -62,7 +64,9 @@ describe('call node paths on implementation filter change', function() {
 
   it('strips away the C++ functions when going from combined to JS', function() {
     const { dispatch, getState } = storeWithProfile(profile);
-    dispatch(ProfileView.changeSelectedCallNode(threadIndex, [A, B, C, D, E]));
+    dispatch(
+      ProfileView.changeSelectedCallNodeByPath(threadIndex, [A, B, C, D, E])
+    );
     dispatch(ProfileView.changeImplementationFilter('js'));
     expect(selectedThreadSelectors.getSelectedCallNodePath(getState())).toEqual(
       [B, D, E]
@@ -79,7 +83,7 @@ describe('call node paths on implementation filter change', function() {
   it('re-adds the C++ functions when going from JS to combined', function() {
     const { dispatch, getState } = storeWithProfile(profile);
     dispatch(ProfileView.changeImplementationFilter('js'));
-    dispatch(ProfileView.changeSelectedCallNode(threadIndex, [B, D, E]));
+    dispatch(ProfileView.changeSelectedCallNodeByPath(threadIndex, [B, D, E]));
     dispatch(ProfileView.changeImplementationFilter('combined'));
     expect(selectedThreadSelectors.getSelectedCallNodePath(getState())).toEqual(
       [A, B, C, D, E]
@@ -102,7 +106,7 @@ describe('call node paths on implementation filter change', function() {
   it('can go from JS to C++ views', function() {
     const { dispatch, getState } = storeWithProfile(profile);
     dispatch(ProfileView.changeImplementationFilter('js'));
-    dispatch(ProfileView.changeSelectedCallNode(threadIndex, [B, D, E]));
+    dispatch(ProfileView.changeSelectedCallNodeByPath(threadIndex, [B, D, E]));
     dispatch(ProfileView.changeImplementationFilter('cpp'));
     expect(selectedThreadSelectors.getSelectedCallNodePath(getState())).toEqual(
       [A, C]
@@ -134,7 +138,6 @@ describe('expand all call node descendants', function() {
 
   it('expands whole tree from root', function() {
     const { dispatch, getState } = storeWithProfile(profile);
-    const callNodeInfo = selectedThreadSelectors.getCallNodeInfo(getState());
 
     // Before expand all action is dispatched, nothing is expanded
     expect(
@@ -144,8 +147,7 @@ describe('expand all call node descendants', function() {
     dispatch(
       ProfileView.expandAllCallNodeDescendants(
         threadIndex,
-        0, // A
-        callNodeInfo
+        0 // A
       )
     );
 
@@ -165,9 +167,7 @@ describe('expand all call node descendants', function() {
     const { dispatch, getState } = storeWithProfile(profile);
 
     // First expand A by selecting B
-    dispatch(ProfileView.changeSelectedCallNode(threadIndex, [A, B]));
-
-    const callNodeInfo = selectedThreadSelectors.getCallNodeInfo(getState());
+    dispatch(ProfileView.changeSelectedCallNodeByPath(threadIndex, [A, B]));
 
     // Before expand all action is dispatched, only A is expanded
     expect(
@@ -180,8 +180,7 @@ describe('expand all call node descendants', function() {
     dispatch(
       ProfileView.expandAllCallNodeDescendants(
         threadIndex,
-        1, // B
-        callNodeInfo
+        1 // B
       )
     );
 

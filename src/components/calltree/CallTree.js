@@ -50,7 +50,7 @@ type StateProps = {|
   +tree: CallTree,
   +callNodeInfo: CallNodeInfo,
   +selectedCallNodeIndex: IndexIntoCallNodeTable | null,
-  +expandedCallNodeIndexes: Array<IndexIntoCallNodeTable | null>,
+  +expandedCallNodeIndexes: Array<IndexIntoCallNodeTable>,
   +searchStringsRegExp: RegExp | null,
   +disableOverscan: boolean,
   +invertCallstack: boolean,
@@ -127,23 +127,15 @@ class CallTreeComponent extends PureComponent<Props> {
   }
 
   _onSelectedCallNodeChange(newSelectedCallNode: IndexIntoCallNodeTable) {
-    const { callNodeInfo, threadIndex, changeSelectedCallNode } = this.props;
-    changeSelectedCallNode(
-      threadIndex,
-      getCallNodePath(newSelectedCallNode, callNodeInfo.callNodeTable)
-    );
+    const { threadIndex, changeSelectedCallNode } = this.props;
+    changeSelectedCallNode(threadIndex, newSelectedCallNode);
   }
 
   _onExpandedCallNodesChange(
-    newExpandedCallNodeIndexes: Array<IndexIntoCallNodeTable | null>
+    newExpandedCallNodeIndexes: IndexIntoCallNodeTable[]
   ) {
-    const { callNodeInfo, threadIndex, changeExpandedCallNodes } = this.props;
-    changeExpandedCallNodes(
-      threadIndex,
-      newExpandedCallNodeIndexes.map(callNodeIndex =>
-        getCallNodePath(callNodeIndex, callNodeInfo.callNodeTable)
-      )
-    );
+    const { threadIndex, changeExpandedCallNodes } = this.props;
+    changeExpandedCallNodes(threadIndex, newExpandedCallNodeIndexes);
   }
 
   _onAppendageButtonClick(callNodeIndex: IndexIntoCallNodeTable | null) {
