@@ -530,15 +530,17 @@ class TreeView<
       }
     } else if (event.keyCode === 39) {
       // KEY_RIGHT
+      // If the selected element has no children, there's nothing to expand or
+      // select.
+      if (!this.props.tree.hasChildren(selected)) {
+        return;
+      }
       const isCollapsed = this._isCollapsed(selected);
       if (isCollapsed) {
         this._toggle(selected);
-      } else {
-        // Do KEY_DOWN only if the next element is a child
-        if (this.props.tree.hasChildren(selected)) {
-          this._select(this.props.tree.getChildren(selected)[0]);
-        }
       }
+
+      this._select(this.props.tree.getChildren(selected)[0]);
     } else if (event.keyCode === 40) {
       // KEY_DOWN
       if (selectedRowIndex < visibleRows.length - 1) {
