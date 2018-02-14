@@ -120,12 +120,17 @@ export class CallTree {
   }
 
   getAllDescendants(
-    callNodeIndex: IndexIntoCallNodeTable
+    callNodeIndex: IndexIntoCallNodeTable,
+    maxDepth: number = Number.POSITIVE_INFINITY
   ): Set<IndexIntoCallNodeTable> {
-    const result = new Set([]);
+    const result = new Set();
+    if (!maxDepth) {
+      return result;
+    }
+
     for (const child of this.getChildren(callNodeIndex)) {
       result.add(child);
-      for (const descendant of this.getAllDescendants(child)) {
+      for (const descendant of this.getAllDescendants(child, maxDepth - 1)) {
         result.add(descendant);
       }
     }

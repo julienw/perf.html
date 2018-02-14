@@ -432,23 +432,39 @@ class TreeView<
     return !this.props.expandedNodeIds.includes(nodeId);
   }
 
+  // Returns the deepest expanded child, only if newExpanded is true. It won't
+  // likely be correct if toggleAll is true.
   _toggle(
     nodeId: NodeIndex,
     newExpanded: boolean = this._isCollapsed(nodeId),
     toggleAll: * = false
-  ) {
+  ): NodeIndex | null {
+    const { tree } = this.props;
     const newSet = new Set(this.props.expandedNodeIds);
+    let deepestExpandedChild = null;
     if (newExpanded) {
       newSet.add(nodeId);
+      deepestExpandedChild = nodeId;
       if (toggleAll) {
-        for (const descendant of this.props.tree.getAllDescendants(nodeId)) {
+        for (const descendant of tree.getAllDescendants(nodeId)) {
           newSet.add(descendant);
+          deepestExpandedChild = descendant;
+        }
+      } else {
+        for (
+          let i = 0, children = tree.getChildren(deepestExpandedChild);
+          i < 10 && children.length === 1;
+          i++, children = tree.getChildren(deepestExpandedChild)
+        ) {
+          deepestExpandedChild = children[0];
+          newSet.add(deepestExpandedChild);
         }
       }
     } else {
       newSet.delete(nodeId);
     }
     this.props.onExpandedNodesChange(Array.from(newSet.values()));
+    return deepestExpandedChild;
   }
 
   _toggleAll(
@@ -500,6 +516,7 @@ class TreeView<
     event.stopPropagation();
     event.preventDefault();
 
+    const { tree } = this.props;
     const selected = this.props.selectedNodeId;
     const visibleRows = this._getAllVisibleRows(this.props);
     const selectedRowIndex = visibleRows.findIndex(
@@ -518,7 +535,7 @@ class TreeView<
       if (!isCollapsed) {
         this._toggle(selected);
       } else {
-        const parent = this.props.tree.getParent(selected);
+        const parent = tree.getParent(selected);
         if (parent !== -1) {
           this._select(parent);
         }
@@ -532,15 +549,19 @@ class TreeView<
       // KEY_RIGHT
       // If the selected element has no children, there's nothing to expand or
       // select.
-      if (!this.props.tree.hasChildren(selected)) {
+      if (!tree.hasChildren(selected)) {
         return;
       }
-      const isCollapsed = this._isCollapsed(selected);
-      if (isCollapsed) {
-        this._toggle(selected);
-      }
 
-      this._select(this.props.tree.getChildren(selected)[0]);
+      const deepestChild = this._toggle(selected, true);
+      if (deepestChild !== null) {
+        const deepestChildChildren = tree.getChildren(deepestChild);
+        if (deepestChildChildren.length) {
+          this._select(deepestChildChildren[0]);
+        } else {
+          this._select(deepestChild);
+        }
+      }
     } else if (event.keyCode === 40) {
       // KEY_DOWN
       if (selectedRowIndex < visibleRows.length - 1) {
