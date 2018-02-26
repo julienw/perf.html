@@ -114,7 +114,7 @@ class ProfileThreadHeaderBar extends PureComponent<Props> {
     const newSelectedStack = thread.samples.stack[sampleIndex];
     const newSelectedCallNode =
       newSelectedStack === null
-        ? -1
+        ? null
         : callNodeInfo.stackIndexToCallNodeIndex[newSelectedStack];
     changeSelectedCallNode(threadIndex, newSelectedCallNode);
     focusCallTree();
