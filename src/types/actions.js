@@ -96,6 +96,7 @@ type ReceiveProfileAction =
   | {
       type: 'COALESCED_FUNCTIONS_UPDATE',
       functionsUpdatePerThread: FunctionsUpdatePerThread,
+      callNodeTable: CallNodeTable,
     }
   | { type: 'DONE_SYMBOLICATING' }
   | { type: 'ERROR_RECEIVING_PROFILE_FROM_FILE', error: Error }

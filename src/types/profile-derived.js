@@ -32,10 +32,19 @@ export type IndexIntoCallNodeTable = number;
  *
  * For a detailed explanation of callNodes see `docs/call-tree.md` and
  * `docs/call-nodes-in-cpp.md`.
+ *
+ * Whenever we use a number as an `IndexIntoCallNodeTable`, this means an entry in
+ * this table. And actually this means an entry to both `prefix` (representing
+ * the call chain) and `func` (representing the actual function). So this table
+ * is nothing more than a relationship table.
+ * We can convert from/to this table with the functions `getCallNodePathFromIndex`
+ * and `getCallNodeIndexFromPath` in `profile-logic/profile-data.js`, as they're
+ * completely equivalent. A CallNodePath is nothing more than having the call
+ * chain unrolled.
  */
 export type CallNodeTable = {
-  prefix: Int32Array,
-  func: Int32Array,
+  prefix: Int32Array, // really Array<IndexIntoCallNodeTable>
+  func: Int32Array, //   really Array<IndexIntoFuncTable>
   depth: number[],
   length: number,
 };

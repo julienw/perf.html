@@ -69,10 +69,13 @@ export function doneSymbolicating(): Action {
 
 export function coalescedFunctionsUpdate(
   functionsUpdatePerThread: FunctionsUpdatePerThread
-): Action {
-  return {
-    type: 'COALESCED_FUNCTIONS_UPDATE',
-    functionsUpdatePerThread,
+): ThunkAction<void> {
+  return (dispatch, getState) => {
+    return {
+      type: 'COALESCED_FUNCTIONS_UPDATE',
+      functionsUpdatePerThread,
+      callNodeTable: selectorsForThread,
+    };
   };
 }
 

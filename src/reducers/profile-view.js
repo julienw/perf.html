@@ -99,7 +99,10 @@ function symbolicationStatus(
   }
 }
 
-function viewOptionsPerThread(state: ThreadViewOptions[] = [], action: Action) {
+function viewOptionsPerThread(
+  state: ThreadViewOptions[] = [],
+  action: Action
+): ThreadViewOptions[] {
   switch (action.type) {
     case 'RECEIVE_PROFILE_FROM_ADDON':
     case 'RECEIVE_PROFILE_FROM_STORE':
@@ -111,7 +114,7 @@ function viewOptionsPerThread(state: ThreadViewOptions[] = [], action: Action) {
         selectedMarker: -1,
       }));
     case 'COALESCED_FUNCTIONS_UPDATE': {
-      const { functionsUpdatePerThread } = action;
+      const { functionsUpdatePerThread, callNodeTable } = action;
       // For each thread, apply oldFuncToNewFuncMap to that thread's
       // selectedCallNodePath and expandedCallNodePaths.
       return state.map((threadViewOptions, threadIndex) => {
@@ -119,12 +122,18 @@ function viewOptionsPerThread(state: ThreadViewOptions[] = [], action: Action) {
           return threadViewOptions;
         }
         const { oldFuncToNewFuncMap } = functionsUpdatePerThread[threadIndex];
+        const selectedCallNodePath = ProfileData.getCallNodePath(
+          threadViewOptions.selectedCallNodeIndex,
+          callNodeTable
+        );
+        const newSelectedCallNodePath = selectedCallNodePath.map(oldFunc => {
+          const newFunc = oldFuncToNewFuncMap.get(oldFunc);
+          return newFunc === undefined ? oldFunc : newFunc;
+        });
         return {
-          selectedCallNodePath: threadViewOptions.selectedCallNodePath.map(
-            oldFunc => {
-              const newFunc = oldFuncToNewFuncMap.get(oldFunc);
-              return newFunc === undefined ? oldFunc : newFunc;
-            }
+          selectedCallNodeIndex: ProfileData.getCallNodeFromPath(
+            newSelectedCallNodePath,
+            callNodeTable
           ),
           expandedCallNodePaths: threadViewOptions.expandedCallNodePaths.map(
             oldPath => {
