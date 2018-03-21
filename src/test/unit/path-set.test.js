@@ -4,7 +4,7 @@
 
 // @flow
 
-import { PathSet, arePathsEqual } from '../../utils/path';
+import { PathSet, PathMap, arePathsEqual } from '../../utils/path';
 
 describe('PathSet', function() {
   const sampleValues = [[1], [1, 3], [2, 3, 9]];
@@ -109,6 +109,26 @@ describe('PathSet', function() {
 
     const expectedEntries = sampleValues.map(val => [val, val]);
     expect(Array.from(set.entries())).toEqual(expectedEntries);
+  });
+});
+
+describe('PathMap', function() {
+  const sampleValues = [[1], [1, 3], [2, 3, 9]];
+
+  it('implements the constructors and basic methods', function() {
+    const map = new PathMap();
+    expect(map.size).toBe(0);
+
+    // Basic set/get methods
+    sampleValues.forEach((value, i) => map.set(value, i));
+    expect(map.size).toBe(3);
+    sampleValues.forEach((value, i) => expect(map.get(value.slice())).toBe(i));
+
+    // Test we overwrite keys with the same content instead of adding them
+    const slicedValue = sampleValues[2].slice();
+    map.set(slicedValue, 10);
+    expect(map.size).toBe(3);
+    expect(map.get(slicedValue.slice())).toBe(10);
   });
 });
 

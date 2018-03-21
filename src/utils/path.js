@@ -116,3 +116,30 @@ export class PathSet implements Iterable<CallNodePath> {
   }
   */
 }
+
+// This class implements some characteristics of a native map that are needed to
+// provide a simple cache, whose keys are CallNodePaths.
+// These paths can be different objects, but as long as they contain the same
+// data, they are considered to be the same.
+// Like PathSet, these CallNodePaths are keyed off of the string value returned
+// by the `hashPath` function above.
+export class PathMap<V> {
+  _table: Map<string, V>;
+
+  constructor() {
+    this._table = new Map();
+  }
+
+  set(path: CallNodePath, value: V): PathMap<V> {
+    this._table.set(hashPath(path), value);
+    return this;
+  }
+
+  get(path: CallNodePath): V | void {
+    return this._table.get(hashPath(path));
+  }
+
+  get size(): number {
+    return this._table.size;
+  }
+}
