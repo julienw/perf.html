@@ -17,10 +17,10 @@ export default function selectSidebar(
   return {
     calltree: CallTreeSidebar,
     //calltree: null,
-    'marker-table': null,
+    'flame-graph': null,
     'stack-chart': null,
     'marker-chart': null,
+    'marker-table': null,
     'network-chart': null,
-    'flame-graph': null,
   }[selectedTab];
 }
