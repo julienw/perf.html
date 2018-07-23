@@ -183,10 +183,21 @@ type Geometry = {
   innerRectY: CssPixels,
 };
 
-class VirtualList extends React.PureComponent<VirtualListProps> {
+type VirtualListState = {|
+  visibleRangeStart: number,
+  visibleRangeEnd: number,
+|};
+
+class VirtualList extends React.PureComponent<
+  VirtualListProps,
+  VirtualListState
+> {
   _container: ?HTMLDivElement;
   _inner: ?VirtualListInner;
-  _geometry: ?Geometry;
+  state = {
+    visibleRangeStart: 0,
+    visibleRangeEnd: 100,
+  };
 
   _takeContainerRef = (element: ?HTMLDivElement) => {
     this._container = element;
@@ -220,8 +231,10 @@ class VirtualList extends React.PureComponent<VirtualListProps> {
   }
 
   _onScroll = () => {
-    this._geometry = this._queryGeometry();
-    this.forceUpdate();
+    const geometry = this._queryGeometry();
+    if (geometry) {
+      this.setState(this.computeVisibleRange(geometry));
+    }
   };
 
   _onCopy = (event: Event) => {
@@ -241,12 +254,9 @@ class VirtualList extends React.PureComponent<VirtualListProps> {
     return { outerRect, innerRectY };
   }
 
-  computeVisibleRange() {
+  computeVisibleRange(geometry: Geometry) {
     const { itemHeight, disableOverscan } = this.props;
-    if (!this._geometry) {
-      return { visibleRangeStart: 0, visibleRangeEnd: 100 };
-    }
-    const { outerRect, innerRectY } = this._geometry;
+    const { outerRect, innerRectY } = geometry;
     const overscan = disableOverscan ? 0 : 25;
     const chunkSize = 16;
     let visibleRangeStart =
@@ -310,7 +320,7 @@ class VirtualList extends React.PureComponent<VirtualListProps> {
       containerWidth,
     } = this.props;
     const columnCount = this.props.columnCount || 1;
-    const { visibleRangeStart, visibleRangeEnd } = this.computeVisibleRange();
+    const { visibleRangeStart, visibleRangeEnd } = this.state;
     return (
       <div
         className={className}
