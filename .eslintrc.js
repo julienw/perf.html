@@ -14,9 +14,8 @@ module.exports = {
     'prettier/react',
   ],
   parserOptions: {
-    ecmaVersion: '2017',
+    ecmaVersion: '2018',
     ecmaFeatures: {
-      experimentalObjectRestSpread: true,
       jsx: true,
     },
     sourceType: 'module',
@@ -69,7 +68,6 @@ module.exports = {
     'default-case': 'error',
     'dot-notation': 'error',
     eqeqeq: 'error',
-    'for-direction': 'error',
     'no-alert': 'error',
     'no-caller': 'error',
     'no-eval': 'error',
