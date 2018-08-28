@@ -142,10 +142,10 @@ class StackChartCanvas extends React.PureComponent<Props> {
             (stackTiming.end[i] - rangeStart) / rangeLength;
 
           const x: CssPixels =
-            (startTime - viewportLeft) * containerWidth / viewportLength;
+            ((startTime - viewportLeft) * containerWidth) / viewportLength;
           const y: CssPixels = depth * ROW_HEIGHT - viewportTop;
           const w: CssPixels =
-            (endTime - startTime) * containerWidth / viewportLength;
+            ((endTime - startTime) * containerWidth) / viewportLength;
           const h: CssPixels = ROW_HEIGHT - 1;
 
           if (w < 2) {
@@ -236,7 +236,10 @@ class StackChartCanvas extends React.PureComponent<Props> {
     return (
       <div className="stackChartCanvasTooltip">
         <div className="tooltipOneLine tooltipHeader">
-          <div className="tooltipTiming">{formatNumber(duration)}ms</div>
+          <div className="tooltipTiming">
+            {formatNumber(duration)}
+            ms
+          </div>
           <div className="tooltipTitle">{label}</div>
         </div>
         <div className="tooltipDetails">

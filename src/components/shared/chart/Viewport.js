@@ -444,7 +444,7 @@ export const withChartViewport: WithChartViewport<*, *> =
         // Calculate left and right in terms of the unit interval of the profile range.
         const viewportLength: CssPixels = viewportRight - viewportLeft;
         const unitOffsetX: UnitIntervalOfProfileRange =
-          viewportLength * offsetX / containerWidth;
+          (viewportLength * offsetX) / containerWidth;
         let newViewportLeft: CssPixels = viewportLeft - unitOffsetX;
         let newViewportRight: CssPixels = viewportRight - unitOffsetX;
         if (newViewportLeft < 0) {

@@ -80,7 +80,10 @@ class ZipFileRowImpl extends React.PureComponent<ZipFileRowProps> {
       return;
     }
     event.preventDefault();
-    const { viewProfileFromZip, displayData: { zipTableIndex } } = this.props;
+    const {
+      viewProfileFromZip,
+      displayData: { zipTableIndex },
+    } = this.props;
     if (zipTableIndex !== null) {
       viewProfileFromZip(zipTableIndex);
     }
@@ -299,7 +302,8 @@ class ZipFileViewer extends React.PureComponent<Props> {
             zip file at the following path:
           </span>,
           <span className="zipFileViewerUntrustedFilePath" key="path">
-            /{
+            /
+            {
               // This is text that comes from the URL, make sure it looks visually
               // distinct for guarding against someone doing anything too funky
               // with it.
@@ -314,7 +318,8 @@ class ZipFileViewer extends React.PureComponent<Props> {
             Failed to find a file in the zip at the following path:
           </span>,
           <span className="zipFileViewerUntrustedFilePath" key="path">
-            /{
+            /
+            {
               // This is text that comes from the URL, make sure it looks visually
               // distinct for guarding against someone doing anything too funky
               // with it.

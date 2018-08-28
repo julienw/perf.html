@@ -289,7 +289,8 @@ function _markerBacktrace(
     return (
       <div className="tooltipDetailsBackTrace" key="backtrace">
         <h2 className="tooltipBackTraceTitle">
-          First invalidated {formatNumber(causeAge)}ms before the flush, at:
+          First invalidated {formatNumber(causeAge)}
+          ms before the flush, at:
         </h2>
         <Backtrace
           cause={cause}

@@ -120,7 +120,7 @@ class TimelineTracingMarkersImplementation extends React.PureComponent<
     const { width, rangeStart, rangeEnd, intervalMarkers, styles } = this.props;
     const x = e.pageX - r.left;
     const y = e.pageY - r.top;
-    const time = rangeStart + x / width * (rangeEnd - rangeStart);
+    const time = rangeStart + (x / width) * (rangeEnd - rangeStart);
 
     // Markers are drawn in array order; the one drawn last is on top. So if
     // there are multiple markers under the mouse, we want to find the one
@@ -283,9 +283,9 @@ class TimelineTracingMarkersImplementation extends React.PureComponent<
 
     intervalMarkers.forEach(marker => {
       const { start, dur, name } = marker;
-      const pos = (start - rangeStart) / (rangeEnd - rangeStart) * width;
+      const pos = ((start - rangeStart) / (rangeEnd - rangeStart)) * width;
       const itemWidth = Number.isFinite(dur)
-        ? dur / (rangeEnd - rangeStart) * width
+        ? (dur / (rangeEnd - rangeStart)) * width
         : Number.MAX_SAFE_INTEGER;
       const style = name in styles ? styles[name] : styles.default;
       ctx.fillStyle = style.background;

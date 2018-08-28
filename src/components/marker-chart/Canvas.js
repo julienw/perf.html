@@ -192,11 +192,11 @@ class MarkerChartCanvas extends React.PureComponent<Props, State> {
             (markerTiming.end[i] - rangeStart) / rangeLength;
 
           const x: CssPixels =
-            (startTime - viewportLeft) * containerWidth / viewportLength;
+            ((startTime - viewportLeft) * containerWidth) / viewportLength;
           const y: CssPixels = rowIndex * rowHeight - viewportTop;
           const w: CssPixels = Math.max(
             10,
-            (endTime - startTime) * containerWidth / viewportLength
+            ((endTime - startTime) * containerWidth) / viewportLength
           );
           const h: CssPixels = rowHeight - 1;
 
@@ -293,7 +293,7 @@ class MarkerChartCanvas extends React.PureComponent<Props, State> {
     const minDuration =
       rangeLength *
       viewportLength *
-      (rowHeight * 2 * MARKER_DOT_RADIUS / containerWidth);
+      ((rowHeight * 2 * MARKER_DOT_RADIUS) / containerWidth);
     const markerTiming = markerTimingRows[rowIndex];
 
     if (!markerTiming) {

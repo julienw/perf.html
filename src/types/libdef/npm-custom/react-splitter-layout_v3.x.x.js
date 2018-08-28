@@ -19,5 +19,5 @@ declare type $$reactsplitterlayout$$Props = {|
 |};
 
 declare module 'react-splitter-layout' {
-  declare export default React$ComponentType<$$reactsplitterlayout$$Props>
+  declare export default React$ComponentType<$$reactsplitterlayout$$Props>;
 }

@@ -645,7 +645,9 @@ describe('snapshots of selectors/profile-view', function() {
 
     const [samplesThread] = profile.threads;
     // Add in a thread with markers
-    const { threads: [markersThread] } = getProfileWithMarkers([
+    const {
+      threads: [markersThread],
+    } = getProfileWithMarkers([
       ['A', 0, null],
       ['B', 1, null],
       ['C', 2, null],

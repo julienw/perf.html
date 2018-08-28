@@ -88,7 +88,10 @@ describe('calltree/CallNodeContextMenu', function() {
       'drop-function',
     ]) {
       it(`adds a transform for "${type}"`, function() {
-        const { store: { getState }, findMenuItem } = setup();
+        const {
+          store: { getState },
+          findMenuItem,
+        } = setup();
         findMenuItem(type).simulate('click');
         expect(
           selectedThreadSelectors.getTransformStack(getState())[0].type
@@ -99,7 +102,10 @@ describe('calltree/CallNodeContextMenu', function() {
 
   describe('clicking on the rest of the menu items', function() {
     it('can expand all call nodes in the call tree', function() {
-      const { store: { getState }, findMenuItem } = setup();
+      const {
+        store: { getState },
+        findMenuItem,
+      } = setup();
       expect(
         selectedThreadSelectors.getExpandedCallNodeIndexes(getState())
       ).toHaveLength(1);

@@ -391,7 +391,10 @@ describe('profile-data', function() {
   }
 
   describe('getCallNodeInfo', function() {
-    const { meta, threads: [thread] } = getCallNodeProfile();
+    const {
+      meta,
+      threads: [thread],
+    } = getCallNodeProfile();
     const defaultCategory = meta.categories.findIndex(c => c.name === 'Other');
     const { callNodeTable, stackIndexToCallNodeIndex } = getCallNodeInfo(
       thread.stackTable,
@@ -808,7 +811,9 @@ describe('funcHasRecursiveCall', function() {
 
 describe('convertStackToCallNodePath', function() {
   it('correctly returns a call node path for a stack', function() {
-    const { threads: [thread] } = getCallNodeProfile();
+    const {
+      threads: [thread],
+    } = getCallNodeProfile();
     const stack1 = thread.samples.stack[0];
     const stack2 = thread.samples.stack[1];
     if (stack1 === null || stack2 === null) {
@@ -858,7 +863,10 @@ describe('getTimingsForPath in a non-inverted tree', function() {
   }
 
   it('returns good timings for a root node', () => {
-    const { getTimingsForPath, funcNamesDict: { A } } = setup();
+    const {
+      getTimingsForPath,
+      funcNamesDict: { A },
+    } = setup();
 
     // This is a root node: it should have no self time but all the total time.
     const timings = getTimingsForPath([A]);
@@ -882,7 +890,10 @@ describe('getTimingsForPath in a non-inverted tree', function() {
   });
 
   it('returns good timings for a leaf node, also present in other stacks', () => {
-    const { getTimingsForPath, funcNamesDict: { A, B, Cjs, D, Ejs } } = setup();
+    const {
+      getTimingsForPath,
+      funcNamesDict: { A, B, Cjs, D, Ejs },
+    } = setup();
 
     // This is a leaf node: it should have some self time and some total time
     // holding the same value.
@@ -919,7 +930,10 @@ describe('getTimingsForPath in a non-inverted tree', function() {
   });
 
   it('returns good timings for a node that has both children and self time', () => {
-    const { getTimingsForPath, funcNamesDict: { A, B, H } } = setup();
+    const {
+      getTimingsForPath,
+      funcNamesDict: { A, B, H },
+    } = setup();
 
     // This is a node that has both children and some self time. So it should
     // have some running time that's different than the self time.
@@ -981,7 +995,10 @@ describe('getTimingsForPath for an inverted tree', function() {
   }
 
   it('returns good timings for a root node', () => {
-    const { getTimingsForPath, funcNamesDict: { Ejs } } = setup();
+    const {
+      getTimingsForPath,
+      funcNamesDict: { Ejs },
+    } = setup();
     const timings = getTimingsForPath([Ejs]);
     expect(timings).toEqual({
       forPath: {
@@ -1006,7 +1023,10 @@ describe('getTimingsForPath for an inverted tree', function() {
   });
 
   it('returns good timings for a node present in several stacks without self time', () => {
-    const { getTimingsForPath, funcNamesDict: { Ejs, D, Cjs, B } } = setup();
+    const {
+      getTimingsForPath,
+      funcNamesDict: { Ejs, D, Cjs, B },
+    } = setup();
     const timings = getTimingsForPath([Ejs, D, Cjs, B]);
     expect(timings).toEqual({
       forPath: {
@@ -1032,7 +1052,10 @@ describe('getTimingsForPath for an inverted tree', function() {
   });
 
   it('returns good timings for a node present in several stacks with self time', () => {
-    const { getTimingsForPath, funcNamesDict: { I, H } } = setup();
+    const {
+      getTimingsForPath,
+      funcNamesDict: { I, H },
+    } = setup();
 
     // Select the function as a root node
     let timings = getTimingsForPath([H]);
@@ -1064,7 +1087,10 @@ describe('getTimingsForPath for an inverted tree', function() {
   });
 
   it('returns good timings for a leaf node', () => {
-    const { getTimingsForPath, funcNamesDict: { H, B, A } } = setup();
+    const {
+      getTimingsForPath,
+      funcNamesDict: { H, B, A },
+    } = setup();
     const timings = getTimingsForPath([H, B, A]);
     expect(timings).toEqual({
       forPath: {

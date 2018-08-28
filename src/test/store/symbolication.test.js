@@ -83,7 +83,11 @@ describe('doSymbolicateProfile', function() {
 
   describe('doSymbolicateProfile', function() {
     it('can symbolicate a profile', async () => {
-      const { store: { dispatch, getState }, profile, symbolStore } = init();
+      const {
+        store: { dispatch, getState },
+        profile,
+        symbolStore,
+      } = init();
       expect(formatTree(getCallTree(getState()))).toEqual([
         '- 0x000a (total: 1, self: —)',
         '  - 0x2000 (total: 1, self: 1)',
@@ -104,7 +108,11 @@ describe('doSymbolicateProfile', function() {
     });
 
     it('updates the symbolication status', async () => {
-      const { store: { dispatch, getState }, profile, symbolStore } = init();
+      const {
+        store: { dispatch, getState },
+        profile,
+        symbolStore,
+      } = init();
       // Starts out as DONE.
       expect(ProfileViewSelectors.getSymbolicationStatus(getState())).toEqual(
         'DONE'
@@ -127,7 +135,10 @@ describe('doSymbolicateProfile', function() {
   describe('merging of functions with different memory addresses, but in the same function', () => {
     it('starts with expanded call nodes of multiple memory addresses', async function() {
       // Don't use the mocks on this test, as no SymbolStore database is needed.
-      const { store: { dispatch, getState }, funcNamesToFuncIndexes } = init();
+      const {
+        store: { dispatch, getState },
+        funcNamesToFuncIndexes,
+      } = init();
 
       const threadIndex = 0;
       const selectedCallNodePath = funcNamesToFuncIndexes(['0x000a', '0x2000']);

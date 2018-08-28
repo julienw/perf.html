@@ -147,11 +147,13 @@ function Breakdown({ data }: BreakdownProps) {
   const totalTime = data.reduce((result, item) => result + item.value, 0);
 
   return data.filter(({ value }) => value).map(({ group, value }) => {
-    const percentage = Math.round(value / totalTime * 100);
+    const percentage = Math.round((value / totalTime) * 100);
 
     return (
       <SidebarDetail label={group} key={group}>
-        {value}ms ({percentage}%)
+        {value}
+        ms ({percentage}
+        %)
       </SidebarDetail>
     );
   });
@@ -185,13 +187,13 @@ class CallTreeSidebar extends React.PureComponent<Props> {
       );
     }
 
-    const totalTimePercent = Math.round(totalTime.value / rootTime * 100);
-    const selfTimePercent = Math.round(selfTime.value / rootTime * 100);
+    const totalTimePercent = Math.round((totalTime.value / rootTime) * 100);
+    const selfTimePercent = Math.round((selfTime.value / rootTime) * 100);
     const totalTimeForFuncPercent = Math.round(
-      totalTimeForFunc.value / rootTime * 100
+      (totalTimeForFunc.value / rootTime) * 100
     );
     const selfTimeForFuncPercent = Math.round(
-      selfTimeForFunc.value / rootTime * 100
+      (selfTimeForFunc.value / rootTime) * 100
     );
 
     return (
@@ -212,7 +214,9 @@ class CallTreeSidebar extends React.PureComponent<Props> {
         </header>
         <h3 className="sidebar-title2">This selected call node</h3>
         <SidebarDetail label="Running Time">
-          {totalTime.value}ms ({totalTimePercent}%)
+          {totalTime.value}
+          ms ({totalTimePercent}
+          %)
         </SidebarDetail>
         <SidebarDetail label="Self Time">
           {selfTime.value ? `${selfTime.value}ms (${selfTimePercent}%)` : '—'}
@@ -235,7 +239,9 @@ class CallTreeSidebar extends React.PureComponent<Props> {
         ) : null}
         <h3 className="sidebar-title2">This function across the entire tree</h3>
         <SidebarDetail label="Running Time">
-          {totalTimeForFunc.value}ms ({totalTimeForFuncPercent}%)
+          {totalTimeForFunc.value}
+          ms ({totalTimeForFuncPercent}
+          %)
         </SidebarDetail>
         <SidebarDetail label="Self Time">
           {selfTimeForFunc.value

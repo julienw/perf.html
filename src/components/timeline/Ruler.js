@@ -49,7 +49,7 @@ class TimelineRuler extends PureComponent<Props> {
     const notches = [];
     for (let i = firstNotchIndex; i <= lastNotchIndex; i++) {
       notches.push({
-        time: i * notchTime / 1000,
+        time: (i * notchTime) / 1000,
         pos: (i * notchTime - (rangeStart - zeroAt)) * pixelsPerMilliSecond,
       });
     }

@@ -78,7 +78,8 @@ class UploadButton extends React.PureComponent<UploadButtonProps> {
 function DocsButton() {
   return (
     <a href="/docs/" className="homeSectionButton">
-      <span className="homeSectionDocsIcon" />Documentation
+      <span className="homeSectionDocsIcon" />
+      Documentation
     </a>
   );
 }
@@ -264,10 +265,11 @@ class Home extends React.PureComponent<HomeProps, HomeState> {
               the{' '}
               <InstallButton name="Gecko Profiler" xpiUrl={LEGACY_ADDON_URL}>
                 Gecko Profiler Add-on
-              </InstallButton>. Then use the button added to the browser, or use
-              the following shortcuts to record a profile. The button’s icon is
-              blue when a profile is recording. Hit <kbd>Capture Profile</kbd>{' '}
-              to load the data into perf.html.
+              </InstallButton>
+              . Then use the button added to the browser, or use the following
+              shortcuts to record a profile. The button’s icon is blue when a
+              profile is recording. Hit <kbd>Capture Profile</kbd> to load the
+              data into perf.html.
             </p>
             {this._renderShortcuts()}
             <p>
