@@ -92,7 +92,6 @@ const _upgraders = {
         .map(lib => {
           if ('breakpadId' in lib) {
             lib.debugName = lib.name.substr(lib.name.lastIndexOf('/') + 1);
-            lib.breakpadId = lib.breakpadId;
           } else {
             lib.debugName = lib.pdbName;
             const pdbSig = lib.pdbSignature.replace(/[{}-]/g, '').toUpperCase();
