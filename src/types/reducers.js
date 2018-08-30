@@ -122,7 +122,7 @@ export type AppState = {|
   +hasZoomedViaMousewheel: boolean,
   +isSidebarOpenPerPanel: IsSidebarOpenPerPanelState,
   +panelLayoutGeneration: number,
-  +lastVisibleThreadTabSlug: TabSlug,
+  +lastVisibleThreadTabSlug: TabSlug | null,
 |};
 
 export type ZippedProfilesState = {

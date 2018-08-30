@@ -137,9 +137,9 @@ function panelLayoutGeneration(state: number = 0, action: Action): number {
  * transition them back to the panel they were using.
  */
 function lastVisibleThreadTabSlug(
-  state: TabSlug = 'calltree',
+  state: TabSlug | null = null,
   action: Action
-): TabSlug {
+): TabSlug | null {
   switch (action.type) {
     case 'SELECT_TRACK':
     case 'CHANGE_SELECTED_TAB':
