@@ -353,7 +353,6 @@ export function getTimingsForPath(
   return getTimingsForCallNodeIndex(
     getCallNodeIndexFromPath(needlePath, callNodeInfo.callNodeTable),
     callNodeInfo,
-    interval,
     isInvertedTree,
     thread,
     categories
@@ -367,7 +366,6 @@ export function getTimingsForPath(
 export function getTimingsForCallNodeIndex(
   needleNodeIndex: IndexIntoCallNodeTable | null,
   { callNodeTable, stackIndexToCallNodeIndex }: CallNodeInfo,
-  interval: number,
   isInvertedTree: boolean,
   thread: Thread,
   categories: CategoryList
@@ -419,10 +417,11 @@ export function getTimingsForCallNodeIndex(
       value: number,
     },
     stackIndex: IndexIntoStackTable,
-    funcIndex: IndexIntoFuncTable
+    funcIndex: IndexIntoFuncTable,
+    duration: Milliseconds
   ): void {
     // Step 1: increment the total value
-    timings.value += interval;
+    timings.value += duration;
 
     // Step 2: find the implementation value for this stack
     const implementation = funcTable.isJS[funcIndex]
@@ -436,7 +435,7 @@ export function getTimingsForCallNodeIndex(
     if (timings.breakdownByImplementation[implementation] === undefined) {
       timings.breakdownByImplementation[implementation] = 0;
     }
-    timings.breakdownByImplementation[implementation] += interval;
+    timings.breakdownByImplementation[implementation] += duration;
 
     // step 4: find the category value for this stack
     const categoryIndex = stackTable.category[stackIndex];
@@ -449,20 +448,22 @@ export function getTimingsForCallNodeIndex(
         subcategoryBreakdown: Array(category.subcategories.length).fill(0),
       }));
     }
-    timings.breakdownByCategory[categoryIndex].entireCategoryValue += interval;
+    timings.breakdownByCategory[categoryIndex].entireCategoryValue += duration;
     timings.breakdownByCategory[categoryIndex].subcategoryBreakdown[
       subcategoryIndex
-    ] += interval;
+    ] += duration;
   }
 
   // Loop over each sample and accumulate the self time, running time, and
   // the implementation breakdown.
-  for (const thisStackIndex of samples.stack) {
+  for (let sampleIndex = 0; sampleIndex < samples.length; sampleIndex++) {
+    const thisStackIndex = samples.stack[sampleIndex];
     if (thisStackIndex === null) {
       continue;
     }
+    const duration = samples.duration[sampleIndex];
 
-    rootTime += interval;
+    rootTime += duration;
 
     const thisNodeIndex = stackIndexToCallNodeIndex[thisStackIndex];
     const thisFunc = callNodeTable.func[thisNodeIndex];
@@ -470,11 +471,21 @@ export function getTimingsForCallNodeIndex(
     if (!isInvertedTree) {
       // For non-inverted trees, we compute the self time from the stacks' leaf nodes.
       if (thisNodeIndex === needleNodeIndex) {
-        accumulateDataToTimings(pathTimings.selfTime, thisStackIndex, thisFunc);
+        accumulateDataToTimings(
+          pathTimings.selfTime,
+          thisStackIndex,
+          thisFunc,
+          duration
+        );
       }
 
       if (thisFunc === needleFuncIndex) {
-        accumulateDataToTimings(funcTimings.selfTime, thisStackIndex, thisFunc);
+        accumulateDataToTimings(
+          funcTimings.selfTime,
+          thisStackIndex,
+          thisFunc,
+          duration
+        );
       }
     }
 
@@ -505,7 +516,8 @@ export function getTimingsForCallNodeIndex(
           accumulateDataToTimings(
             pathTimings.totalTime,
             thisStackIndex,
-            thisFunc
+            thisFunc,
+            duration
           );
         }
 
@@ -522,7 +534,8 @@ export function getTimingsForCallNodeIndex(
           accumulateDataToTimings(
             funcTimings.totalTime,
             thisStackIndex,
-            thisFunc
+            thisFunc,
+            duration
           );
         }
         funcFound = true;
@@ -546,7 +559,7 @@ export function getTimingsForCallNodeIndex(
           // This root node matches the passed call node path.
           // This is the only place where we don't accumulate timings, mainly
           // because this would be the same as for the total time.
-          pathTimings.selfTime.value += interval;
+          pathTimings.selfTime.value += duration;
         }
 
         if (currentFuncIndex === needleFuncIndex) {
@@ -554,7 +567,8 @@ export function getTimingsForCallNodeIndex(
           accumulateDataToTimings(
             funcTimings.selfTime,
             currentStackIndex,
-            currentFuncIndex
+            currentFuncIndex,
+            duration
           );
         }
 
@@ -564,7 +578,8 @@ export function getTimingsForCallNodeIndex(
           accumulateDataToTimings(
             pathTimings.totalTime,
             currentStackIndex,
-            currentFuncIndex
+            currentFuncIndex,
+            duration
           );
         }
 
@@ -574,7 +589,8 @@ export function getTimingsForCallNodeIndex(
           accumulateDataToTimings(
             funcTimings.totalTime,
             currentStackIndex,
-            currentFuncIndex
+            currentFuncIndex,
+            duration
           );
         }
       }
@@ -584,16 +600,17 @@ export function getTimingsForCallNodeIndex(
   return { forPath: pathTimings, forFunc: funcTimings, rootTime };
 }
 
-export function getTimeRangeForThread(
-  thread: Thread,
-  interval: number
-): StartEndRange {
+export function getTimeRangeForThread(thread: Thread): StartEndRange {
   if (thread.samples.length === 0) {
     return { start: Infinity, end: -Infinity };
   }
+
+  const lastSampleIndex = thread.samples.length - 1;
   return {
     start: thread.samples.time[0],
-    end: thread.samples.time[thread.samples.length - 1] + interval,
+    end:
+      thread.samples.time[lastSampleIndex] +
+      thread.samples.duration[lastSampleIndex],
   };
 }
 
@@ -602,7 +619,7 @@ export function getTimeRangeIncludingAllThreads(
 ): StartEndRange {
   const completeRange = { start: Infinity, end: -Infinity };
   profile.threads.forEach(thread => {
-    const threadRange = getTimeRangeForThread(thread, profile.meta.interval);
+    const threadRange = getTimeRangeForThread(thread);
     completeRange.start = Math.min(completeRange.start, threadRange.start);
     completeRange.end = Math.max(completeRange.end, threadRange.end);
   });
@@ -914,6 +931,7 @@ export function filterThreadSamplesToRange(
   const newSamples = {
     length: sEnd - sBegin,
     time: samples.time.slice(sBegin, sEnd),
+    duration: samples.duration.slice(sBegin, sEnd),
     stack: samples.stack.slice(sBegin, sEnd),
     responsiveness: samples.responsiveness.slice(sBegin, sEnd),
   };
@@ -1296,8 +1314,7 @@ export function invertCallstack(
 
 export function getSampleIndexClosestToTime(
   samples: SamplesTable,
-  time: number,
-  interval: number
+  time: number
 ): IndexIntoSamplesTable {
   // Bisect to find the index of the first sample after the provided time.
   const index = bisection.right(samples.time, time);
@@ -1312,8 +1329,11 @@ export function getSampleIndexClosestToTime(
 
   // Check the distance between the provided time and the center of the bisected sample
   // and its predecessor.
-  const distanceToThis = samples.time[index] + interval / 2 - time;
-  const distanceToLast = time - (samples.time[index - 1] + interval / 2);
+  const previousIndex = index - 1;
+  const distanceToThis =
+    samples.time[index] + samples.duration[index] / 2 - time;
+  const distanceToLast =
+    time - (samples.time[previousIndex] + samples.duration[previousIndex] / 2);
   return distanceToThis < distanceToLast ? index : index - 1;
 }
 
