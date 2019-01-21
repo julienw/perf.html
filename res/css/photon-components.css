@@ -79,3 +79,48 @@
   border: 1px solid var(--red-60);
   box-shadow: 0 0 0 1px var(--red-60), 0 0 0 4px rgba(251, 0, 34, 0.3);
 }
+
+/* https://design.firefox.com/photon/components/message-bars.html */
+.photon-message-bar {
+  width: 100%;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+  border-radius: 4px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  box-sizing: border-box;
+}
+
+.photon-message-bar-error {
+  background-color: var(--red-60);
+  color: #fff;
+}
+
+.photon-message-bar-error > * {
+  margin: 0 4px;
+}
+
+.photon-message-bar-error-icon {
+  display: inline-block;
+  height: 15px;
+  width: 15px;
+  background-image: url(../img/svg/error.svg);
+  flex-shrink: 0;
+}
+
+.photon-message-bar-error-action {
+  background-color: var(--red-70);
+  font-size: 11px;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  padding: 6px;
+  margin-left: 8px;
+}
+
+.photon-message-bar-error-action:hover {
+  background-color: var(--red-80);
+}
