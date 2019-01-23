@@ -11,6 +11,7 @@
 
   /* photon styles */
   background-color: var(--grey-90-a10);
+  color: var(--grey-90);
   border-radius: 2px;
   font: inherit;
 }
@@ -52,6 +53,10 @@
   background-color: var(--grey-90-a20);
 }
 
+.photon-button-micro {
+  height: 24px;
+}
+
 /* --- Inputs --- */
 
 /* See https://design.firefox.com/photon/components/input-fields.html for the spec */
@@ -80,7 +85,8 @@
   box-shadow: 0 0 0 1px var(--red-60), 0 0 0 4px rgba(251, 0, 34, 0.3);
 }
 
-/* https://design.firefox.com/photon/components/message-bars.html */
+/* --- Message bars --- */
+/* See https://design.firefox.com/photon/components/message-bars.html */
 .photon-message-bar {
   width: 100%;
   font-size: 13px;
@@ -94,33 +100,30 @@
   box-sizing: border-box;
 }
 
-.photon-message-bar-error {
-  background-color: var(--red-60);
-  color: #fff;
-}
-
-.photon-message-bar-error > * {
-  margin: 0 4px;
-}
-
-.photon-message-bar-error-icon {
-  display: inline-block;
-  height: 15px;
-  width: 15px;
-  background-image: url(../img/svg/error.svg);
-  flex-shrink: 0;
-}
-
-.photon-message-bar-error-action {
-  background-color: var(--red-70);
-  font-size: 11px;
-  border: none;
-  border-radius: 4px;
-  color: #fff;
-  padding: 6px;
+.photon-message-bar .photon-button {
   margin-left: 8px;
 }
 
-.photon-message-bar-error-action:hover {
+.photon-message-bar-error {
+  /* Note: 8px is: 4px (left padding for the message bar) + 4px (left padding
+   * for the icon) */
+  background: url(../img/svg/error.svg) no-repeat 8px center / 16px 16px var(--red-60);
+  /* Note: 32px is: 4px (left padding for the message bar) + 4px (left padding
+   * for the icon) + 16px (icon width) + 4px (right padding for the icon) + 4px
+   * (space between icon and text) */
+  padding: 4px 4px 4px 32px;
+  color: #fff;
+}
+
+.photon-message-bar-error .photon-button {
+  background-color: var(--red-70);
+  color: #fff;
+}
+
+.photon-message-bar-error .photon-button:hover {
   background-color: var(--red-80);
+}
+
+.photon-message-bar-error .photon-button:hover:active {
+  background-color: var(--red-90);
 }
