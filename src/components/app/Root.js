@@ -7,8 +7,6 @@ import React, { Fragment, PureComponent } from 'react';
 import { Provider } from 'react-redux';
 import explicitConnect from '../../utils/connect';
 
-import ProfileViewer from './ProfileViewer';
-import ZipFileViewer from './ZipFileViewer';
 import Home from './Home';
 import CompareHome from './CompareHome';
 import { ProfileRootMessage } from './ProfileRootMessage';
@@ -127,7 +125,7 @@ class ProfileViewWhenReadyImpl extends PureComponent<ProfileViewProps> {
         // The data is now loaded. This could be either a single profile, or a zip file
         // with multiple profiles. Only show the ZipFileViewer if the data loaded is a
         // Zip file, and there is no stored path into the zip file.
-        return hasZipFile ? <ZipFileViewer /> : <ProfileViewer />;
+        return null;
       case 'ROUTE_NOT_FOUND':
       default:
         // Assert with Flow that we've handled all the cases, as the only thing left
