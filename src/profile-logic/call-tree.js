@@ -25,6 +25,7 @@ import type {
   CallNodeData,
   CallNodeDisplayData,
 } from '../types/profile-derived';
+import type { Milliseconds } from '../types/units';
 import ExtensionIcon from '../../res/img/svg/extension.svg';
 import {
   formatNumberDependingOnInterval,
@@ -261,7 +262,8 @@ export class CallTree {
 function _getInvertedStackSelfTimes(
   thread: Thread,
   callNodeTable: CallNodeTable,
-  sampleCallNodes: Array<IndexIntoCallNodeTable | null>
+  sampleCallNodes: Array<IndexIntoCallNodeTable | null>,
+  interval: Milliseconds
 ): {
   // In an inverted profile, all the self time is accounted to the root nodes.
   // So `callNodeSelfTime` will be 0 for all non-root nodes.
@@ -305,7 +307,9 @@ function _getInvertedStackSelfTimes(
     const callNodeIndex = sampleCallNodes[sampleIndex];
     if (callNodeIndex !== null) {
       const rootIndex = callNodeToRoot[callNodeIndex];
-      const duration = thread.samples.duration[sampleIndex];
+      const duration = thread.samples.duration
+        ? thread.samples.duration[sampleIndex]
+        : interval;
       callNodeSelfTime[rootIndex] += duration;
       callNodeLeafTime[callNodeIndex] += duration;
     }
@@ -320,7 +324,8 @@ function _getInvertedStackSelfTimes(
 function _getStackSelfTimes(
   thread: Thread,
   callNodeTable: CallNodeTable,
-  sampleCallNodes: Array<null | IndexIntoCallNodeTable>
+  sampleCallNodes: Array<null | IndexIntoCallNodeTable>,
+  interval: Milliseconds
 ): {
   callNodeSelfTime: Float32Array, // Milliseconds[]
   callNodeLeafTime: Float32Array, // Milliseconds[]
@@ -334,7 +339,10 @@ function _getStackSelfTimes(
   ) {
     const callNodeIndex = sampleCallNodes[sampleIndex];
     if (callNodeIndex !== null) {
-      callNodeSelfTime[callNodeIndex] += thread.samples.duration[sampleIndex];
+      const duration = thread.samples.duration
+        ? thread.samples.duration[sampleIndex]
+        : interval;
+      callNodeSelfTime[callNodeIndex] += duration;
     }
   }
 
@@ -348,6 +356,7 @@ function _getStackSelfTimes(
 export function computeCallTreeCountsAndTimings(
   thread: Thread,
   { callNodeTable, stackIndexToCallNodeIndex }: CallNodeInfo,
+  interval: Milliseconds,
   invertCallstack: boolean
 ): CallTreeCountsAndTimings {
   const sampleCallNodes = getSampleCallNodes(
@@ -356,8 +365,13 @@ export function computeCallTreeCountsAndTimings(
   );
   // Inverted trees need a different method for computing the timing.
   const { callNodeSelfTime, callNodeLeafTime } = invertCallstack
-    ? _getInvertedStackSelfTimes(thread, callNodeTable, sampleCallNodes)
-    : _getStackSelfTimes(thread, callNodeTable, sampleCallNodes);
+    ? _getInvertedStackSelfTimes(
+        thread,
+        callNodeTable,
+        sampleCallNodes,
+        interval
+      )
+    : _getStackSelfTimes(thread, callNodeTable, sampleCallNodes, interval);
 
   // Compute the following variables:
   const callNodeTotalTime = new Float32Array(callNodeTable.length);
@@ -404,6 +418,7 @@ export function computeCallTreeCountsAndTimings(
  */
 export function getCallTree(
   thread: Thread,
+  interval: Milliseconds,
   callNodeInfo: CallNodeInfo,
   categories: CategoryList,
   implementationFilter: string,
@@ -418,7 +433,7 @@ export function getCallTree(
     } = callTreeCountsAndTimings;
 
     const jsOnly = implementationFilter === 'js';
-    const isIntegerInterval = Number.isInteger(thread.samples.duration[0]);
+    const isIntegerInterval = Number.isInteger(interval);
 
     return new CallTree(
       thread,

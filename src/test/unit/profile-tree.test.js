@@ -46,7 +46,7 @@ describe('unfiltered call tree', function() {
 
   function callTreeFromProfile(profile: Profile): CallTree {
     const [thread] = profile.threads;
-    const { categories } = profile.meta;
+    const { interval, categories } = profile.meta;
     const defaultCategory = categories.findIndex(c => c.name === 'Other');
     const callNodeInfo = getCallNodeInfo(
       thread.stackTable,
@@ -57,10 +57,12 @@ describe('unfiltered call tree', function() {
     const callTreeCountsAndTimings = computeCallTreeCountsAndTimings(
       thread,
       callNodeInfo,
+      interval,
       false
     );
     return getCallTree(
       thread,
+      interval,
       callNodeInfo,
       categories,
       'combined',
@@ -85,9 +87,14 @@ describe('unfiltered call tree', function() {
       defaultCategory
     );
 
-    it('does', function() {
+    it('yields expected results', function() {
       expect(
-        computeCallTreeCountsAndTimings(thread, callNodeInfo, false)
+        computeCallTreeCountsAndTimings(
+          thread,
+          callNodeInfo,
+          profile.meta.interval,
+          false
+        )
       ).toEqual({
         rootCount: 1,
         rootTotalTime: 3,
@@ -402,7 +409,7 @@ describe('inverted call tree', function() {
       E                Z           Y
                                    Z
     `).profile;
-    const { categories } = profile.meta;
+    const { interval, categories } = profile.meta;
     const defaultCategory = categories.findIndex(c => c.color === 'grey');
 
     // Check the non-inverted tree first.
@@ -416,15 +423,18 @@ describe('inverted call tree', function() {
     const callTreeCountsAndTimings = computeCallTreeCountsAndTimings(
       thread,
       callNodeInfo,
+      interval,
       true
     );
     const callTree = getCallTree(
       thread,
+      interval,
       callNodeInfo,
       categories,
       'combined',
       callTreeCountsAndTimings
     );
+
     it('computes an non-inverted call tree', function() {
       expect(formatTreeIncludeCategories(callTree)).toEqual([
         '- A [Other] (total: 3, self: 3)',
@@ -452,10 +462,12 @@ describe('inverted call tree', function() {
     const invertedCallTreeCountsAndTimings = computeCallTreeCountsAndTimings(
       invertedThread,
       invertedCallNodeInfo,
+      interval,
       true
     );
     const invertedCallTree = getCallTree(
       invertedThread,
+      interval,
       invertedCallNodeInfo,
       categories,
       'combined',

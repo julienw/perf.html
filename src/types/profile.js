@@ -92,7 +92,7 @@ export type SamplesTable = {|
   responsiveness: Array<?Milliseconds>,
   stack: Array<IndexIntoStackTable | null>,
   time: Milliseconds[],
-  duration: Milliseconds[],
+  duration?: Milliseconds[],
   length: number,
 |};
 
