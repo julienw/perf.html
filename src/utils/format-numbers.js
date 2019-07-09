@@ -58,6 +58,10 @@ export function formatNumber(
    * Note that numDigitsOnLeft can be negative when the first non-zero digit
    * is on the right of the decimal point.  0.01 = -1
    */
+  if (isNaN(value)) {
+    return 'NaN';
+  }
+
   let numDigitsOnLeft = Math.floor(Math.log10(Math.abs(value))) + 1;
   if (style === 'percent') {
     // We receive percent values as `0.4` but display them as `40`, so we
