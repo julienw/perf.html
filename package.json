@@ -118,6 +118,7 @@
     "html-webpack-plugin": "^4.5.0",
     "husky": "^4.3.0",
     "jest": "^26.4.2",
+    "jest-axe": "^4.0.0",
     "json-loader": "^0.5.7",
     "local-web-server": "^4.2.1",
     "lockfile-lint": "^4.3.7",
@@ -156,6 +157,7 @@
       "\\.(css|less)$": "<rootDir>/src/test/fixtures/mocks/style-mock.js"
     },
     "setupFilesAfterEnv": [
+      "jest-axe/extend-expect",
       "./src/test/setup.js"
     ],
     "verbose": false
