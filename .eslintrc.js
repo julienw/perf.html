@@ -25,6 +25,7 @@ module.exports = {
   rules: {
     // Plugin rules:
     'import/no-duplicates': 'error',
+    'import/no-default-export': 'error',
     'import/no-unresolved': 'error',
     'import/named': 'error',
     'prettier/prettier': 'error',
