@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`app/ServiceWorkerManager shows a notice when the SW is updated, and the user can close it 1`] = `
+exports[`app/ServiceWorkerManager in the home, with the \`none\` datasource shows a notice when the SW is updated, and the user can close it 1`] = `
 <div
   class="serviceworker-ready-notice-wrapper"
 >

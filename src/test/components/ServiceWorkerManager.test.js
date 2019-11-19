@@ -11,15 +11,25 @@ import serviceWorkerRuntime from 'offline-plugin/runtime';
 import ServiceWorkerManager from '../../components/app/ServiceWorkerManager';
 import { stateFromLocation } from '../../app-logic/url-handling';
 import { updateUrlState } from '../../actions/app';
-import { fatalError } from '../../actions/receive-profile';
+import {
+  fatalError,
+  viewProfile,
+  startSymbolicating,
+  doneSymbolicating,
+} from '../../actions/receive-profile';
 
 import { blankStore } from '../fixtures/stores';
+import { getProfileFromTextSamples } from '../fixtures/profiles/processed-profile';
 
 // Mock the offline plugin library.
 jest.mock('offline-plugin/runtime', () => ({
   install: jest.fn(),
   applyUpdate: jest.fn(),
 }));
+
+function _getSimpleProfile() {
+  return getProfileFromTextSamples('A').profile;
+}
 
 describe('app/ServiceWorkerManager', () => {
   // Opt out of Flow checking for this variable because we're doing
@@ -91,52 +101,87 @@ describe('app/ServiceWorkerManager', () => {
     expect(serviceWorkerRuntime.install).not.toHaveBeenCalled();
   });
 
-  it('calls the appropriate functions to update the service worker', () => {
-    process.env.NODE_ENV = 'production';
+  describe('in the home, with the `none` datasource', () => {
+    it('calls the appropriate functions to update the service worker', () => {
+      process.env.NODE_ENV = 'production';
 
-    setup();
-    expect(serviceWorkerRuntime.install).toHaveBeenCalled();
+      setup();
+      expect(serviceWorkerRuntime.install).toHaveBeenCalled();
 
-    const installOptions = serviceWorkerRuntime.install.mock.calls[0][0];
-    installOptions.onUpdating();
-    expect(serviceWorkerRuntime.applyUpdate).not.toHaveBeenCalled();
-    installOptions.onUpdateReady();
-    expect(serviceWorkerRuntime.applyUpdate).toHaveBeenCalled();
-    installOptions.onUpdated();
-    installOptions.onInstalled();
-    expect(console.log).toHaveBeenCalledTimes(4);
+      const installOptions = serviceWorkerRuntime.install.mock.calls[0][0];
+      installOptions.onUpdating();
+      expect(serviceWorkerRuntime.applyUpdate).not.toHaveBeenCalled();
+      installOptions.onUpdateReady();
+      expect(serviceWorkerRuntime.applyUpdate).toHaveBeenCalled();
+      installOptions.onUpdated();
+      installOptions.onInstalled();
+      expect(console.log).toHaveBeenCalledTimes(4);
+    });
+
+    it('shows a notice when the SW is updated, and the user can close it', () => {
+      process.env.NODE_ENV = 'production';
+
+      const { container, getByLabelText, getByText } = setup();
+
+      const installOptions = serviceWorkerRuntime.install.mock.calls[0][0];
+      installOptions.onUpdated();
+      expect(console.log).toHaveBeenCalled();
+      expect(container.firstChild).toMatchSnapshot();
+
+      const closeButton = getByLabelText(/hide/i);
+      fireEvent.click(closeButton);
+      expect(container.firstChild).toBe(null);
+
+      // Getting a new update should display the notice again
+      installOptions.onUpdated();
+      const reloadButton = getByText(/reload/i);
+      fireEvent.click(reloadButton);
+      expect(window.location.reload).toHaveBeenCalledTimes(1);
+    });
   });
 
-  it('shows a notice when the SW is updated, and the user can close it', () => {
-    process.env.NODE_ENV = 'production';
+  describe('with the `public` datasource', () => {
+    it(`doesn't show a notice until a profile is fully loaded`, async () => {
+      process.env.NODE_ENV = 'production';
 
-    const { container, getByLabelText, getByText } = setup();
+      const { navigateToStoreLoadingPage, container, dispatch } = setup();
 
-    const installOptions = serviceWorkerRuntime.install.mock.calls[0][0];
-    installOptions.onUpdated();
-    expect(console.log).toHaveBeenCalled();
-    expect(container.firstChild).toMatchSnapshot();
+      navigateToStoreLoadingPage();
 
-    const closeButton = getByLabelText(/hide/i);
-    fireEvent.click(closeButton);
-    expect(container.firstChild).toBe(null);
+      const installOptions = serviceWorkerRuntime.install.mock.calls[0][0];
 
-    // Getting a new update should display the notice again
-    installOptions.onUpdated();
-    const reloadButton = getByText(/reload/i);
-    fireEvent.click(reloadButton);
-    expect(window.location.reload).toHaveBeenCalledTimes(1);
-  });
+      installOptions.onUpdateReady();
+      expect(serviceWorkerRuntime.applyUpdate).not.toHaveBeenCalled();
+      expect(container.firstChild).toBe(null);
 
-  it('shows a notice with the `public` datasource too', () => {
-    process.env.NODE_ENV = 'production';
+      await dispatch(viewProfile(_getSimpleProfile()));
+      expect(serviceWorkerRuntime.applyUpdate).toHaveBeenCalled();
 
-    const { navigateToStoreLoadingPage, container } = setup();
-    navigateToStoreLoadingPage();
+      installOptions.onUpdated();
+      expect(container.firstChild).not.toBe(null);
+    });
 
-    const installOptions = serviceWorkerRuntime.install.mock.calls[0][0];
-    installOptions.onUpdated();
-    expect(container.firstChild).not.toBe(null);
+    it(`doesn't show a notice until we're done symbolicating`, async () => {
+      process.env.NODE_ENV = 'production';
+
+      const { navigateToStoreLoadingPage, dispatch, container } = setup();
+
+      navigateToStoreLoadingPage();
+      await dispatch(viewProfile(_getSimpleProfile()));
+      dispatch(startSymbolicating());
+
+      const installOptions = serviceWorkerRuntime.install.mock.calls[0][0];
+
+      installOptions.onUpdateReady();
+      expect(serviceWorkerRuntime.applyUpdate).not.toHaveBeenCalled();
+      expect(container.firstChild).toBe(null);
+
+      dispatch(doneSymbolicating());
+      expect(serviceWorkerRuntime.applyUpdate).toHaveBeenCalled();
+
+      installOptions.onUpdated();
+      expect(container.firstChild).not.toBe(null);
+    });
   });
 
   it('does not show a notice with the `from-addon` datasource', () => {
@@ -146,12 +191,29 @@ describe('app/ServiceWorkerManager', () => {
     navigateToAddonLoadingPage();
 
     const installOptions = serviceWorkerRuntime.install.mock.calls[0][0];
+    installOptions.onUpdateReady();
     installOptions.onUpdated();
+    expect(serviceWorkerRuntime.applyUpdate).not.toHaveBeenCalled();
     expect(container.firstChild).toBe(null);
   });
 
   describe('automatic reloading', () => {
     it('reloads the application automatically if there is an error and there is a pending version', () => {
+      process.env.NODE_ENV = 'production';
+
+      const { dispatch } = setup();
+
+      const installOptions = serviceWorkerRuntime.install.mock.calls[0][0];
+
+      dispatch(fatalError(new Error('Error while loading profile')));
+      expect(window.location.reload).not.toHaveBeenCalled();
+      expect(serviceWorkerRuntime.applyUpdate).not.toHaveBeenCalled();
+      installOptions.onUpdateReady();
+      expect(serviceWorkerRuntime.applyUpdate).toHaveBeenCalled();
+      expect(window.location.reload).toHaveBeenCalled();
+    });
+
+    it('reloads the application automatically if there is an error and there is a ready version happening then', () => {
       process.env.NODE_ENV = 'production';
 
       const { dispatch } = setup();
@@ -163,7 +225,7 @@ describe('app/ServiceWorkerManager', () => {
       expect(window.location.reload).toHaveBeenCalled();
     });
 
-    it('reloads the application automatically if there is an error and a new version is notified', () => {
+    it('reloads the application automatically if there is an error and a new version has been notified before', () => {
       process.env.NODE_ENV = 'production';
 
       const { dispatch } = setup();
