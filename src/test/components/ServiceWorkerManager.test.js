@@ -47,6 +47,12 @@ describe('app/ServiceWorkerManager', () => {
 
     Object.defineProperty(window, 'location', nativeLocation);
     nativeLocation = null;
+
+    // I can't imagine there isn't something easier to do this, but I couldn't
+    // find it. This is necessary to ensure that these mock functions don't have
+    // older call records.
+    serviceWorkerRuntime.install.mockReset();
+    serviceWorkerRuntime.applyUpdate.mockReset();
   });
 
   function setup() {
