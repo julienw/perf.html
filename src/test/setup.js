@@ -23,7 +23,7 @@ afterEach(() => {
   // don't get intermittents from one test's mocks affecting another test's mocks.
   //
   // See https://github.com/facebook/jest/issues/7654
-  jest.resetAllMocks();
+  jest.restoreAllMocks();
   jest.clearAllTimers();
 });
 
