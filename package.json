@@ -120,6 +120,7 @@
     "husky": "^3.0.5",
     "jest": "^24.3.1",
     "jest-environment-jsdom-thirteen": "^1.0.0",
+    "jest-runner-eslint": "^0.7.6",
     "json-loader": "^0.5.7",
     "local-web-server": "^2.6.1",
     "lockfile-lint": "^2.1.4",
@@ -142,27 +143,37 @@
     "webpack-dev-server": "^3.2.1"
   },
   "jest": {
-    "collectCoverageFrom": [
-      "src/**/*.{js,jsx}",
-      "!**/node_modules/**",
-      "!src/types/libdef/**"
-    ],
-    "testEnvironment": "jest-environment-jsdom-thirteen",
-    "moduleFileExtensions": [
-      "js",
-      "jsx"
-    ],
-    "moduleDirectories": [
-      "node_modules"
-    ],
-    "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/src/test/fixtures/mocks/file-mock.js",
-      "\\.(css|less)$": "<rootDir>/src/test/fixtures/mocks/style-mock.js"
-    },
-    "setupFilesAfterEnv": [
-      "./src/test/setup.js"
-    ],
-    "verbose": false
+    "projects": [
+      {
+        "displayName": "test",
+        "collectCoverageFrom": [
+          "src/**/*.{js,jsx}",
+          "!**/node_modules/**",
+          "!src/types/libdef/**"
+        ],
+        "testEnvironment": "jest-environment-jsdom-thirteen",
+        "moduleFileExtensions": [
+          "js",
+          "jsx"
+        ],
+        "moduleDirectories": [
+          "node_modules"
+        ],
+        "moduleNameMapper": {
+          "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/src/test/fixtures/mocks/file-mock.js",
+          "\\.(css|less)$": "<rootDir>/src/test/fixtures/mocks/style-mock.js"
+        },
+        "setupFilesAfterEnv": [
+          "./src/test/setup.js"
+        ],
+        "verbose": false
+      },
+      {
+        "runner": "jest-runner-eslint",
+        "displayName": "lint-js",
+        "testMatch": ["<rootDir>/src/**/*.js", "<rootDir>/*.js", "<rootDir>/bin/**/*.js"]
+      }
+    ]
   },
   "husky": {
     "hooks": {
