@@ -37,17 +37,18 @@ type State = {|
  * reload.
  *
  * Here are some assumptions:
- * - The browser checks for an update (in background) only at startup.
+ * - The browser checks for an update (in background) only when registering the
+ *   SW, when the webapp starts up.
  * - By the time we have a symbolicated profile displayed, everything that
  *   should be downloaded is already downloaded.
  *
  * This means that we can force the new service worker at that time: this
- * shouldn't disturb other open tabs that are fully loaded already, nor this
- * current tab that is also fully loaded.
+ * shouldn't disturb other open tabs that are probably fully loaded already, nor
+ * this current tab that is also fully loaded.
  *
- * If we don't force the new service worker, then, to update, the user will have
- * to close all tabs first. This is not very nice, especially that it's common
- * that our users have several tabs open.
+ * If we didn't force the new service worker, then, to update, the user would
+ * have to close all tabs first. This is not very nice, especially that it's
+ * common that our users have several tabs open.
  *
  * In the future we could decide to force the new service worker only when the
  * user clicks the reload button. This might be necessary if we need to download
@@ -61,6 +62,43 @@ class ServiceWorkerManager extends PureComponent<Props, State> {
     installStatus: 'idle',
     isNoticeDisplayed: false,
   };
+
+  _installServiceWorker() {
+    const runtime = require('offline-plugin/runtime');
+    runtime.install({
+      onInstalled: () => {
+        console.log('[ServiceWorker] App is ready for offline usage!');
+      },
+      onUpdating: () => {
+        console.log(
+          '[ServiceWorker] An update has been found and the browser is downloading the new assets.'
+        );
+      },
+      onUpdateReady: () => {
+        console.log(
+          '[ServiceWorker] We have downloaded the new assets and we are ready to go.'
+        );
+        if (this._shouldUpdateServiceWorker()) {
+          console.log(
+            '[ServiceWorker] The state of the running app is compatible with an immediate activation.'
+          );
+          runtime.applyUpdate();
+        }
+        this.setState({ installStatus: 'pending' });
+      },
+      onUpdated: () => {
+        console.log(
+          '[ServiceWorker] The new version of the application has been enabled.'
+        );
+        this.setState({ installStatus: 'ready', isNoticeDisplayed: true });
+      },
+      onUpdateFailed: () => {
+        console.log(
+          '[ServiceWorker] We failed to update the application for an unknown reason.'
+        );
+      },
+    });
+  }
 
   _isProfileLoadedAndReady(): boolean {
     const { phase, symbolicationStatus } = this.props;
@@ -82,18 +120,23 @@ class ServiceWorkerManager extends PureComponent<Props, State> {
     }
   }
 
+  // This function checks whether we can safely update the service worker,
+  // using the state of the running application.
+  // Of course the profiler viewer could run in another tab. As explained above,
+  // we assume that the tabs running in background will always
   _shouldUpdateServiceWorker(): boolean {
     const { dataSource } = this.props;
 
+    // We use a switch here, to make sure that when somebody adds a new
+    // dataSource, we'll get a flow error if they forget to update here. This is
+    // important because it's not obvious which case new datasources will fall
+    // into.
     switch (dataSource) {
+      case 'none':
+        // This datasource has no profile loaded, we can update it right away.
+        return true;
       case 'from-file':
       case 'from-addon':
-        // We should not propose to reload the page for these data sources,
-        // because we'd lose the data.
-        return false;
-      case 'none':
-        // But for these data sources it should be fine.
-        return true;
       case 'public':
       case 'from-url':
       case 'compare':
@@ -106,38 +149,29 @@ class ServiceWorkerManager extends PureComponent<Props, State> {
     }
   }
 
-  _installServiceWorker() {
-    const runtime = require('offline-plugin/runtime');
-    runtime.install({
-      onInstalled: () => {
-        console.log('[ServiceWorker] App is ready for offline usage!');
-      },
-      onUpdating: () => {
-        console.log(
-          '[ServiceWorker] An update has been found and the browser is downloading the new assets.'
-        );
-      },
-      onUpdateReady: () => {
-        console.log(
-          '[ServiceWorker] We have downloaded the new assets and we are ready to go.'
-        );
-        if (this._shouldUpdateServiceWorker()) {
-          runtime.applyUpdate();
-        }
-        this.setState({ installStatus: 'pending' });
-      },
-      onUpdated: () => {
-        console.log(
-          '[ServiceWorker] The new version of the application has been enabled.'
-        );
-        this.setState({ installStatus: 'ready', isNoticeDisplayed: true });
-      },
-      onUpdateFailed: () => {
-        console.log(
-          '[ServiceWorker] We failed to update the application for an unknown reason.'
-        );
-      },
-    });
+  _canReloadPage(): boolean {
+    const { dataSource } = this.props;
+
+    // We use a switch here, to make sure that when somebody adds a new
+    // dataSource, we'll get a flow error if they forget to update here. This is
+    // important because it's not obvious which case new datasources will fall
+    // into.
+    switch (dataSource) {
+      case 'from-file':
+      case 'from-addon':
+        // We should not propose to reload the page for these data sources,
+        // because we'd lose the data.
+        return false;
+      case 'none':
+      case 'public':
+      case 'from-url':
+      case 'compare':
+      case 'local':
+        // But for these data sources it should be fine.
+        return true;
+      default:
+        throw assertExhaustiveCheck(dataSource);
+    }
   }
 
   componentDidMount() {
@@ -185,7 +219,11 @@ class ServiceWorkerManager extends PureComponent<Props, State> {
       return null;
     }
 
-    if (!this._shouldUpdateServiceWorker()) {
+    // We can display the notice to reload even if the state isn't
+    // ready, so we distinguish the 2 actions "apply SW update" and
+    // "display the notice".
+    // In practice this can happen if the SW is updated in another tab.
+    if (!this._canReloadPage()) {
       return null;
     }
 
