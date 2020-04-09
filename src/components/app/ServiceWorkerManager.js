@@ -24,10 +24,11 @@ type StateProps = {|
 |};
 type Props = ConnectedProps<{||}, StateProps, {||}>;
 
-type InstallStatus = 'pending' | 'ready' | 'idle';
+type InstallStatus = 'pending' | 'installing' | 'installed' | 'idle';
 type State = {|
   installStatus: InstallStatus,
   isNoticeDisplayed: boolean,
+  updatedWhileNotReady: boolean,
 |};
 
 /**
@@ -38,7 +39,8 @@ type State = {|
  *
  * Here are some assumptions:
  * - The browser checks for an update (in background) only when registering the
- *   SW, when the webapp starts up.
+ *   SW, when the webapp starts up. There are other cases where this happens but
+ *   this is more rare.
  * - By the time we have a symbolicated profile displayed, everything that
  *   should be downloaded is already downloaded.
  *
@@ -50,17 +52,29 @@ type State = {|
  * have to close all tabs first. This is not very nice, especially that it's
  * common that our users have several tabs open.
  *
- * In the future we could decide to force the new service worker only when the
- * user clicks the reload button. This might be necessary if we need to download
- * new content after the profile viewer is fully loaded.
- * But be wary that this breaks the F5 capability: the user would _have_ to
+ * We decided to force the new service worker only when the
+ * user clicks the reload button. Here is why:
+ * - As said above, it's common that our users have several tabs open.
+ * - Other tabs will likely be "fully loaded".
+ * - Therefore other tabs will trigger the update, even though the current tab
+ *   isn't ready.
+ * That's why the conscious user action is useful: 1/ this gives a manual
+ * timeout, which could allow the symbolication to finish, and 2/ the user knows
+ * something happens and is in control of it.
+ *
+ * But be wary that this breaks the F5 capability: the user will _have_ to
  * click the button to update (or close all tabs like said above).
+ *
+ * In the future we could store "process in progress" profiles in a local
+ * indexeddb. Then it would be easy to reload the page in case some module
+ * loading fails, and resume the process after the reload.
  */
 
 class ServiceWorkerManager extends PureComponent<Props, State> {
   state = {
     installStatus: 'idle',
     isNoticeDisplayed: false,
+    updatedWhileNotReady: false,
   };
 
   _installServiceWorker() {
@@ -70,6 +84,7 @@ class ServiceWorkerManager extends PureComponent<Props, State> {
         console.log('[ServiceWorker] App is ready for offline usage!');
       },
       onUpdating: () => {
+        // XXX Strangely, this doesn't seem to be called...
         console.log(
           '[ServiceWorker] An update has been found and the browser is downloading the new assets.'
         );
@@ -78,19 +93,30 @@ class ServiceWorkerManager extends PureComponent<Props, State> {
         console.log(
           '[ServiceWorker] We have downloaded the new assets and we are ready to go.'
         );
-        if (this._shouldUpdateServiceWorker()) {
-          console.log(
-            '[ServiceWorker] The state of the running app is compatible with an immediate activation.'
-          );
-          runtime.applyUpdate();
-        }
-        this.setState({ installStatus: 'pending' });
+        this.setState({
+          installStatus: 'pending',
+          isNoticeDisplayed: true,
+        });
       },
       onUpdated: () => {
+        // The update could have been triggered by this tab or another tab.
+        // We distinguish these cases by looking at this.state.installStatus.
         console.log(
           '[ServiceWorker] The new version of the application has been enabled.'
         );
-        this.setState({ installStatus: 'ready', isNoticeDisplayed: true });
+
+        if (this.state.installStatus === 'installing') {
+          // In this page the user clicked on the "reload" button.
+          this.reloadPage();
+          return;
+        }
+
+        // In another page, the user clicked on the "reload" button.
+        this.setState({
+          installStatus: 'installed',
+          // But if we weren't quite ready, we should write it in the notice.
+          updatedWhileNotReady: !this._canUpdateServiceWorker(),
+        });
       },
       onUpdateFailed: () => {
         console.log(
@@ -100,6 +126,7 @@ class ServiceWorkerManager extends PureComponent<Props, State> {
     });
   }
 
+  // This function checks whether the profile is fully loaded.
   _isProfileLoadedAndReady(): boolean {
     const { phase, symbolicationStatus } = this.props;
 
@@ -122,9 +149,7 @@ class ServiceWorkerManager extends PureComponent<Props, State> {
 
   // This function checks whether we can safely update the service worker,
   // using the state of the running application.
-  // Of course the profiler viewer could run in another tab. As explained above,
-  // we assume that the tabs running in background will always
-  _shouldUpdateServiceWorker(): boolean {
+  _canUpdateServiceWorker(): boolean {
     const { dataSource } = this.props;
 
     // We use a switch here, to make sure that when somebody adds a new
@@ -137,38 +162,16 @@ class ServiceWorkerManager extends PureComponent<Props, State> {
         return true;
       case 'from-file':
       case 'from-addon':
+        // We should not propose to reload the page for these data sources,
+        // because we'd lose the data.
+        return false;
       case 'public':
       case 'from-url':
       case 'compare':
       case 'local':
         // Before updating the service worker, we need to make sure the profile
-        // is ready -- which means we don't need to download anything more.
+        // is ready -- which means we won't need to download anything more.
         return this._isProfileLoadedAndReady();
-      default:
-        throw assertExhaustiveCheck(dataSource);
-    }
-  }
-
-  _canReloadPage(): boolean {
-    const { dataSource } = this.props;
-
-    // We use a switch here, to make sure that when somebody adds a new
-    // dataSource, we'll get a flow error if they forget to update here. This is
-    // important because it's not obvious which case new datasources will fall
-    // into.
-    switch (dataSource) {
-      case 'from-file':
-      case 'from-addon':
-        // We should not propose to reload the page for these data sources,
-        // because we'd lose the data.
-        return false;
-      case 'none':
-      case 'public':
-      case 'from-url':
-      case 'compare':
-      case 'local':
-        // But for these data sources it should be fine.
-        return true;
       default:
         throw assertExhaustiveCheck(dataSource);
     }
@@ -191,10 +194,7 @@ class ServiceWorkerManager extends PureComponent<Props, State> {
       const runtime = require('offline-plugin/runtime');
       runtime.applyUpdate();
       this.reloadPage();
-    } else if (
-      installStatus === 'pending' &&
-      this._shouldUpdateServiceWorker()
-    ) {
+    } else if (installStatus === 'pending' && this._canUpdateServiceWorker()) {
       // We may have received a service worker update before we were ready to
       // update (for example: we were still symbolicating). We can apply the
       // new service worker now. When the new service worker will be enabled,
@@ -204,26 +204,95 @@ class ServiceWorkerManager extends PureComponent<Props, State> {
     }
   }
 
-  reloadPage() {
+  applyAndReloadPage = () => {
+    this.setState({ installStatus: 'installing' });
+    const runtime = require('offline-plugin/runtime');
+    runtime.applyUpdate();
+  };
+
+  reloadPage = () => {
     window.location.reload();
-  }
+  };
 
   _onCloseNotice = () => {
     this.setState({ isNoticeDisplayed: false });
   };
 
+  renderButton() {
+    const { installStatus } = this.state;
+
+    switch (installStatus) {
+      case 'installing':
+        return (
+          <button
+            className="photon-button photon-button-micro photon-message-bar-action-button"
+            type="button"
+          >
+            Installing…
+          </button>
+        );
+      case 'idle':
+        throw new Error(
+          `We tried to render the notice's button but because we're in status 'idle', there should be no notice.`
+        );
+      case 'pending':
+        return (
+          <button
+            className="photon-button photon-button-micro photon-message-bar-action-button"
+            type="button"
+            onClick={this.applyAndReloadPage}
+          >
+            Apply and reload
+          </button>
+        );
+      case 'installed':
+        // Another tab applied the new service worker.
+        return (
+          <button
+            className="photon-button photon-button-micro photon-message-bar-action-button"
+            type="button"
+            onClick={this.reloadPage}
+          >
+            Reload
+          </button>
+        );
+      default:
+        throw assertExhaustiveCheck(installStatus);
+    }
+  }
+
   render() {
-    const { isNoticeDisplayed } = this.state;
+    const { isNoticeDisplayed, updatedWhileNotReady } = this.state;
 
     if (!isNoticeDisplayed) {
       return null;
     }
 
-    // We can display the notice to reload even if the state isn't
-    // ready, so we distinguish the 2 actions "apply SW update" and
-    // "display the notice".
-    // In practice this can happen if the SW is updated in another tab.
-    if (!this._canReloadPage()) {
+    if (updatedWhileNotReady) {
+      // The user updated the service worker from another tab, before this tab
+      // was fully loaded. There may be problems if we need to load some
+      // resources, for example the demandling wasm module.
+      return (
+        <div className="serviceworker-ready-notice-wrapper">
+          {/* We use the wrapper to horizontally center the notice */}
+          <div className="photon-message-bar photon-message-bar-warning serviceworker-ready-notice">
+            A new version of the application was applied before this page was
+            fully loaded. You might see malfunctions.
+            {this._canUpdateServiceWorker() ? this.renderButton() : null}
+            <button
+              aria-label="Hide the reload notice"
+              title="Hide the reload notice"
+              className="photon-button photon-message-bar-close-button"
+              type="button"
+              onClick={this._onCloseNotice}
+            />
+          </div>
+        </div>
+      );
+    }
+
+    if (!this._canUpdateServiceWorker()) {
+      // The state in the current tab shows that we're not ready to update.
       return null;
     }
 
@@ -233,13 +302,7 @@ class ServiceWorkerManager extends PureComponent<Props, State> {
         <div className="photon-message-bar serviceworker-ready-notice">
           A new version of the application has been downloaded and is ready to
           use.
-          <button
-            className="photon-button photon-button-micro photon-message-bar-action-button"
-            type="button"
-            onClick={this.reloadPage}
-          >
-            Reload the application
-          </button>
+          {this.renderButton()}
           <button
             aria-label="Hide the reload notice"
             title="Hide the reload notice"
