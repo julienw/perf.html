@@ -31,7 +31,6 @@ import type {
   WrapFunctionInDispatch,
 } from '../../utils/connect';
 import type { UrlState, UrlSetupPhase } from '../../types/state';
-import type { Profile } from '../../types/profile';
 
 type StateProps = {|
   +urlState: UrlState,
@@ -96,19 +95,30 @@ class UrlManager extends React.PureComponent<Props> {
 
     try {
       // Process the raw url and fetch the profile.
-      const results: {
-        profile: Profile | null,
-        shouldSetupInitialUrlState: boolean,
+      // We try to fetch the profile before setting the url state, because
+      // while processing and especially upgrading the url information we may
+      // need the profile data.
+      //
+      // Also note the profile may be null for the `from-addon` dataSource since
+      // we do not `await` for retrieveProfileFromAddon function, but also in
+      // case of fatal errors in the process of retrieving and processing a
+      // profile. To handle the latter case properly, we won't `pushState` if
+      // we're in a FATAL_ERROR state.
+      const {
+        profile,
+        shouldSetupInitialUrlState,
       } = await getProfilesFromRawUrl(window.location);
 
-      // Manually coerce these into the proper type due to the FlowFixMe above.
-      // Profile may be null only for the `from-addon` dataSource since we do
-      // not `await` for retrieveProfileFromAddon function.
-      const profile: Profile | null = results.profile;
-      const shouldSetupInitialUrlState: boolean =
-        results.shouldSetupInitialUrlState;
-      if (profile !== null && shouldSetupInitialUrlState) {
-        setupInitialUrlState(window.location, profile);
+      if (shouldSetupInitialUrlState) {
+        if (profile !== null) {
+          setupInitialUrlState(window.location, profile);
+        } else {
+          // If the profile is null this is likely because we're in an error
+          // state. In that case we don't want to initialize the url state
+          // because we could lose some information in the URL migration. We
+          // don't want to signal that the url setup is done either. This is
+          // probably OK.
+        }
       } else {
         urlSetupDone();
       }
