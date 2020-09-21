@@ -12,6 +12,8 @@
 import * as React from 'react';
 import classNames from 'classnames';
 
+import { ClosePanelContext } from './ClosePanelContext';
+
 import './ArrowPanel.css';
 
 type Props = {|
@@ -43,7 +45,7 @@ export class ArrowPanel extends React.PureComponent<Props, State> {
     this.props.onOpen();
   }
 
-  close() {
+  close = () => {
     this.setState(state => {
       if (!state.open) {
         return null;
@@ -56,7 +58,7 @@ export class ArrowPanel extends React.PureComponent<Props, State> {
 
       return { open: false, isClosing: true, openGeneration };
     });
-  }
+  };
 
   _onCloseAnimationFinish(openGeneration: number) {
     return () => {
@@ -94,7 +96,11 @@ export class ArrowPanel extends React.PureComponent<Props, State> {
           onClick={this._onArrowPanelClick}
         >
           <div className="arrowPanelArrow" />
-          <div className="arrowPanelContent">{children}</div>
+          <div className="arrowPanelContent">
+            <ClosePanelContext.Provider value={this.close}>
+              {children}
+            </ClosePanelContext.Provider>
+          </div>
         </div>
       </div>
     );

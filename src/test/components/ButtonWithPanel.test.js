@@ -5,7 +5,10 @@
 // @flow
 import * as React from 'react';
 import { render, fireEvent } from '@testing-library/react';
-import { ButtonWithPanel } from '../../components/shared/ButtonWithPanel';
+import {
+  ButtonWithPanel,
+  ConfirmDialog,
+} from '../../components/shared/ButtonWithPanel';
 import { ensureExists } from '../../utils/flow';
 import { fireFullClick } from '../fixtures/utils';
 
@@ -45,7 +48,6 @@ describe('shared/ButtonWithPanel', () => {
     expect(container.firstChild).toMatchSnapshot();
   });
 
-  /* These tests will be rewritten when ConfirmDialog is introduced.
   describe('various panel contents', () => {
     it('renders panels with default buttons and titles', () => {
       const { container } = render(
@@ -53,15 +55,11 @@ describe('shared/ButtonWithPanel', () => {
           className="button"
           label="My Button"
           initialOpen={true}
-          panel={
-            <ArrowPanel
-              className="panel"
-              title="Wonderful content"
-              okButtonText="Confirm"
-              cancelButtonText="Cancel"
-            >
+          panelClassName="panel"
+          panelContent={
+            <ConfirmDialog title="Wonderful content">
               <div>Panel content</div>
-            </ArrowPanel>
+            </ConfirmDialog>
           }
         />
       );
@@ -74,22 +72,23 @@ describe('shared/ButtonWithPanel', () => {
           className="button"
           label="My Button"
           initialOpen={true}
-          panel={
-            <ArrowPanel
-              className="panel"
-              okButtonText="Confirm"
-              okButtonType="destructive"
-              cancelButtonText="Cancel"
+          panelClassName="panel"
+          panelContent={
+            <ConfirmDialog
+              className="my-dialog"
+              title="Do you confirm this destructive action?"
+              confirmButtonText="Delete"
+              confirmButtonType="destructive"
+              cancelButtonText="Stop"
             >
               <div>Panel content</div>
-            </ArrowPanel>
+            </ConfirmDialog>
           }
         />
       );
       expect(container.firstChild).toMatchSnapshot();
     });
   });
-  */
 
   describe('protecting against mounting expensive panels', function() {
     it('does not render the contents when closed', function() {

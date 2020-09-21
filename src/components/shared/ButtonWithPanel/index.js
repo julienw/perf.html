@@ -24,5 +24,32 @@
 //     <p>If you want to know more <a href='/'>click here</a>.</p>
 //   </>}
 // />
+//
+// Here is an example with a ConfirmDialog, that implements a standard
+// confirmation dialog, with a title and 2 buttons:
+//
+// import { ButtonWithPanel } from // 'firefox-profiler/components/ButtonWithPanel';
+// ...
+// <ButtonWithPanel
+//   className="MyButtonWithPanel"
+//   buttonClassName="MyPanelButton"
+//   panelClassName="MyPanel"
+//   label="Click me!"
+//   onPanelOpen={this.onOpenConfirmDialog}
+//   onPanelClose={this.onCloseConfirmDialog}
+//   panelContent={
+//     <ConfirmDialog
+//       title="Delete Something"
+//       confirmButtonText="Delete"
+//       confirmButtonType="destructive"
+//       cancelButtonText="Cancel"
+//       onConfirmButtonClick={this.onConfirmDeletion}
+//     >
+//       Are you sure you want to delete uploaded data for this
+//       profile? Links for shared copies will no longer work.
+//     </ConfirmDialog>
+//   }
+// />
 
 export { ButtonWithPanel } from './ButtonWithPanel';
+export { ConfirmDialog } from './ConfirmDialog';
