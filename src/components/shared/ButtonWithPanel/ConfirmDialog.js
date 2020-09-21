@@ -12,8 +12,11 @@ import { ClosePanelContext } from './ClosePanelContext';
 import './ConfirmDialog.css';
 
 type Props = {|
-  +onCancelButtonClick?: () => mixed,
-  +onConfirmButtonClick?: () => mixed,
+  // If these callbacks return promises, they will be waited for before the
+  // panel is closed. To make this explicit we added Promise<mixed> even if that
+  // isn't necessary to pass Flow checks.
+  +onCancelButtonClick?: () => mixed | Promise<mixed>,
+  +onConfirmButtonClick?: () => mixed | Promise<mixed>,
   +className?: string,
   +title: string,
   +cancelButtonText?: string,
@@ -27,19 +30,48 @@ type PropsWithClose = {|
   closePanel: void => mixed,
 |};
 
-export class ConfirmDialogImpl extends React.PureComponent<PropsWithClose> {
-  _onConfirmButtonClick = () => {
-    this.props.closePanel();
-    if (this.props.onConfirmButtonClick) {
-      this.props.onConfirmButtonClick();
-    }
+type State = {|
+  status: 'idle' | 'working',
+|};
+
+export class ConfirmDialogImpl extends React.PureComponent<
+  PropsWithClose,
+  State
+> {
+  state = {
+    status: 'idle',
   };
 
-  _onCancelButtonClick = () => {
-    this.props.closePanel();
-    if (this.props.onCancelButtonClick) {
-      this.props.onCancelButtonClick();
+  _onConfirmButtonClick = async () => {
+    if (this.state.status === 'working') {
+      return;
     }
+
+    this.setState({ status: 'working' });
+    if (this.props.onConfirmButtonClick) {
+      try {
+        await this.props.onConfirmButtonClick();
+      } finally {
+        this.setState({ status: 'idle' });
+      }
+    }
+    this.props.closePanel();
+  };
+
+  _onCancelButtonClick = async () => {
+    if (this.state.status === 'working') {
+      return;
+    }
+
+    this.setState({ status: 'working' });
+    if (this.props.onCancelButtonClick) {
+      try {
+        await this.props.onCancelButtonClick();
+      } finally {
+        this.setState({ status: 'idle' });
+      }
+    }
+    this.props.closePanel();
   };
 
   render() {
@@ -51,6 +83,8 @@ export class ConfirmDialogImpl extends React.PureComponent<PropsWithClose> {
       confirmButtonText,
       confirmButtonType,
     } = this.props;
+    const { status } = this.state;
+
     return (
       <div className={classNames('confirmDialog', className)}>
         <h2 className="confirmDialogTitle">{title}</h2>
@@ -60,6 +94,7 @@ export class ConfirmDialogImpl extends React.PureComponent<PropsWithClose> {
             type="button"
             className="photon-button photon-button-default"
             value={cancelButtonText || 'Cancel'}
+            disabled={status === 'working'}
             onClick={this._onCancelButtonClick}
           />
           <input
@@ -67,6 +102,7 @@ export class ConfirmDialogImpl extends React.PureComponent<PropsWithClose> {
             className={`photon-button photon-button-${confirmButtonType ||
               'primary'}`}
             value={confirmButtonText || 'Confirm'}
+            disabled={status === 'working'}
             onClick={this._onConfirmButtonClick}
           />
         </div>

@@ -162,7 +162,7 @@ exports[`shared/ButtonWithPanel renders the ButtonWithPanel with a closed panel 
 </div>
 `;
 
-exports[`shared/ButtonWithPanel various panel contents renders panels with default buttons and titles 1`] = `
+exports[`shared/ButtonWithPanel with ok and cancel buttons renders panels with default buttons and titles 1`] = `
 <div
   class="buttonWithPanel button open"
 >
@@ -175,7 +175,7 @@ exports[`shared/ButtonWithPanel various panel contents renders panels with defau
     class="arrowPanelAnchor"
   >
     <div
-      class="arrowPanel open panel"
+      class="arrowPanel open"
     >
       <div
         class="arrowPanelArrow"
@@ -219,7 +219,7 @@ exports[`shared/ButtonWithPanel various panel contents renders panels with defau
 </div>
 `;
 
-exports[`shared/ButtonWithPanel various panel contents renders panels with specified buttons 1`] = `
+exports[`shared/ButtonWithPanel with ok and cancel buttons renders panels with specified buttons 1`] = `
 <div
   class="buttonWithPanel button open"
 >
@@ -232,7 +232,7 @@ exports[`shared/ButtonWithPanel various panel contents renders panels with speci
     class="arrowPanelAnchor"
   >
     <div
-      class="arrowPanel open panel"
+      class="arrowPanel open"
     >
       <div
         class="arrowPanelArrow"
