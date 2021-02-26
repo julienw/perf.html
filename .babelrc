@@ -8,11 +8,6 @@
     ["@babel/preset-flow", { all: true }]
   ],
   plugins: [
-    // Without `loose`, the transformation uses `Object.defineProperty` which
-    // obeys the spec more, but we get a bundle that's 8kB larger. That was the
-    // default in babel v6.
-    ["@babel/plugin-proposal-class-properties", { loose: true }],
-    ["@babel/plugin-proposal-object-rest-spread", { useBuiltIns: true }],
     ["module-resolver", {
       "alias": {
         "firefox-profiler": "./src"
