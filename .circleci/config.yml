@@ -52,6 +52,7 @@ jobs:
 
   licence-check:
     executor: node
+    resource_class: small
     steps:
       - checkout-and-dependencies
       - run: yarn license-check
@@ -64,12 +65,14 @@ jobs:
 
   alex:
     executor: node
+    resource_class: small
     steps:
       - checkout-and-dependencies
       - run: yarn test-alex
 
   yarn_lock:
     executor: node
+    resource_class: small
     steps:
       - checkout-and-dependencies
       - run: yarn test-lockfile
@@ -79,6 +82,7 @@ jobs:
   # See also https://github.com/CircleCI-Public/shellcheck-orb/issues/29
   shellcheck:
     executor: base
+    resource_class: small
     steps:
       - checkout
       - shellcheck/install
