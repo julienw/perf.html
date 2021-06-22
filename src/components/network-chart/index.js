@@ -66,6 +66,10 @@ class NetworkChartImpl extends React.PureComponent<Props> {
   _virtualListRef = React.createRef<VirtualList<MarkerIndex>>();
   _memoizedGetSpecialItems = memoize(
     (selectedNetworkMarkerIndex, rightClickedMarkerIndex) => {
+      // We put the selected item and the right clicked item forcibly in
+      // 2 different buckets. Indeed they may not use the same HTML render, and
+      // use different styles, so we want to force a rerender when the currently
+      // selected index becomes the right clicked index, and back.
       const specialItems = [undefined, undefined];
 
       if (selectedNetworkMarkerIndex !== null) {
