@@ -154,6 +154,9 @@ export default function explicitConnect<
     options,
     component,
   } = connectOptions;
+  if (mapStateToProps) {
+    mapStateToProps.displayName = 'mapStateToProps-' + String(component.name);
+  }
 
   // Opt out of the flow-typed definition of react-redux's connect, and use our own.
   return (connect: any)(
