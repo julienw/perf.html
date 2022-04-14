@@ -94,6 +94,18 @@ const MARKER_DOT_RADIUS = 0.25;
 const DOT_WIDTH = 10;
 const LABEL_PADDING = 5;
 
+function snapToDevicePixel(
+  value: CssPixels,
+  minimalValue: CssPixels = 0
+): CssPixels {
+  const { devicePixelRatio } = window;
+
+  return (
+    Math.max(Math.round(value * devicePixelRatio), minimalValue) /
+    devicePixelRatio
+  );
+}
+
 class MarkerChartCanvasImpl extends React.PureComponent<Props> {
   _textMeasurement: null | TextMeasurement;
 
@@ -282,10 +294,10 @@ class MarkerChartCanvasImpl extends React.PureComponent<Props> {
       // Indeed strokes are drawn on both sides equally, so half a pixel on each
       // side in this case.
       ctx.rect(
-        x + 0.5, // + 0.5 for the stroke
-        y + 1 + 0.5, // + 1 for the top margin, + 0.5 for the stroke
-        w - 1, // - 1 to account for left and right strokes.
-        h - 2 - 1 // + 2 accounts for top and bottom margins, + 1 accounts for top and bottom strokes
+        snapToDevicePixel(x) + 0.5, // + 0.5 for the stroke
+        snapToDevicePixel(y + 1) + 0.5, // + 1 for the top margin, + 0.5 for the stroke
+        snapToDevicePixel(w - 1), // - 1 to account for left and right strokes.
+        snapToDevicePixel(h - 2 - 1) // + 2 accounts for top and bottom margins, + 1 accounts for top and bottom strokes
       );
       ctx.fill();
       ctx.stroke();
@@ -343,7 +355,6 @@ class MarkerChartCanvasImpl extends React.PureComponent<Props> {
       },
     } = this.props;
 
-    const { devicePixelRatio } = window;
     const markerContainerWidth = containerWidth - marginLeft - marginRight;
 
     const rangeLength: Milliseconds = rangeEnd - rangeStart;
@@ -393,7 +404,7 @@ class MarkerChartCanvasImpl extends React.PureComponent<Props> {
           const endTime: UnitIntervalOfProfileRange =
             (markerTiming.end[i] - rangeStart) / rangeLength;
 
-          let x: CssPixels =
+          const x: CssPixels =
             ((startTime - viewportLeft) * markerContainerWidth) /
               viewportLength +
             marginLeft;
@@ -408,8 +419,6 @@ class MarkerChartCanvasImpl extends React.PureComponent<Props> {
             // are rendered as squares.
             w = DOT_WIDTH;
           }
-
-          x = Math.round(x * devicePixelRatio) / devicePixelRatio;
 
           const text = markerTiming.label[i];
           const markerIndex = markerTiming.index[i];
@@ -498,13 +507,23 @@ class MarkerChartCanvasImpl extends React.PureComponent<Props> {
     ctx.fillStyle = GREY_20;
     if (timelineTrackOrganization.type !== 'active-tab') {
       // Don't draw the separator on the right side if we are in the active tab.
-      ctx.fillRect(marginLeft - 1, 0, 1, containerHeight);
+      ctx.fillRect(
+        snapToDevicePixel(marginLeft - 1),
+        0,
+        snapToDevicePixel(1),
+        snapToDevicePixel(containerHeight)
+      );
     }
     for (let rowIndex = startRow; rowIndex < endRow; rowIndex++) {
       // `- 1` at the end, because the top separator is not drawn in the canvas,
       // it's drawn using CSS' border property. And canvas positioning is 0-based.
       const y = (rowIndex + 1) * rowHeight - viewportTop - 1;
-      ctx.fillRect(0, y, usefulContainerWidth, 1);
+      ctx.fillRect(
+        0,
+        snapToDevicePixel(y),
+        snapToDevicePixel(usefulContainerWidth),
+        snapToDevicePixel(1)
+      );
     }
 
     const textMeasurement = this._getTextMeasurement(ctx);
@@ -533,13 +552,22 @@ class MarkerChartCanvasImpl extends React.PureComponent<Props> {
         // Draw the text backgound for active tab.
         ctx.fillStyle = '#ffffffbf'; // white with 75% opacity
         const textWidth = textMeasurement.getTextWidth(fittedText);
-        ctx.fillRect(0, y, textWidth + LABEL_PADDING * 2, rowHeight);
+        ctx.fillRect(
+          0,
+          snapToDevicePixel(y),
+          snapToDevicePixel(textWidth + LABEL_PADDING * 2),
+          snapToDevicePixel(rowHeight)
+        );
 
         // Set the fill style back for text.
         ctx.fillStyle = '#000000';
       }
 
-      ctx.fillText(fittedText, LABEL_PADDING, y + TEXT_OFFSET_TOP);
+      ctx.fillText(
+        fittedText,
+        snapToDevicePixel(LABEL_PADDING),
+        snapToDevicePixel(y + TEXT_OFFSET_TOP)
+      );
     }
 
     // Draw the bucket names.
@@ -553,16 +581,35 @@ class MarkerChartCanvasImpl extends React.PureComponent<Props> {
 
       // Draw the backgound.
       ctx.fillStyle = GREY_20;
-      ctx.fillRect(0, y - 1, usefulContainerWidth, rowHeight);
+      ctx.fillRect(
+        0,
+        snapToDevicePixel(y - 1),
+        snapToDevicePixel(usefulContainerWidth),
+        snapToDevicePixel(rowHeight)
+      );
 
       // Draw the borders./*
       ctx.fillStyle = GREY_30;
-      ctx.fillRect(0, y - 1, usefulContainerWidth, 1);
-      ctx.fillRect(0, y + rowHeight - 1, usefulContainerWidth, 1);
+      ctx.fillRect(
+        0,
+        snapToDevicePixel(y - 1),
+        snapToDevicePixel(usefulContainerWidth),
+        snapToDevicePixel(1)
+      );
+      ctx.fillRect(
+        0,
+        snapToDevicePixel(y + rowHeight - 1),
+        snapToDevicePixel(usefulContainerWidth),
+        snapToDevicePixel(1)
+      );
 
       // Draw the text.
       ctx.fillStyle = '#000000';
-      ctx.fillText(bucketName, LABEL_PADDING + marginLeft, y + TEXT_OFFSET_TOP);
+      ctx.fillText(
+        bucketName,
+        snapToDevicePixel(LABEL_PADDING + marginLeft),
+        snapToDevicePixel(y + TEXT_OFFSET_TOP)
+      );
     }
   }
 
