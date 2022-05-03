@@ -535,17 +535,23 @@ class MarkerChartCanvasImpl extends React.PureComponent<Props> {
     const usefulContainerWidth = containerWidth - marginRight;
 
     // Draw separators
-    ctx.fillStyle = GREY_20;
+    ctx.strokeStyle = GREY_20;
+    ctx.beginPath();
     if (timelineTrackOrganization.type !== 'active-tab') {
-      // Don't draw the separator on the right side if we are in the active tab.
-      ctx.fillRect(marginLeft - 1, 0, 1, containerHeight);
+      // Only draw the separator on the right side of the labels if we are not in the active tab.
+      // Indeed in the active tab the labels are on top of the markers.
+      ctx.moveTo(marginLeft - 0.5, 0);
+      ctx.lineTo(marginLeft - 0.5, containerHeight);
     }
     for (let rowIndex = startRow; rowIndex < endRow; rowIndex++) {
       // `- 1` at the end, because the top separator is not drawn in the canvas,
       // it's drawn using CSS' border property. And canvas positioning is 0-based.
       const y = (rowIndex + 1) * rowHeight - viewportTop - 1;
-      ctx.fillRect(0, y, usefulContainerWidth, 1);
+
+      ctx.moveTo(0, y + 0.5);
+      ctx.lineTo(usefulContainerWidth, y + 0.5);
     }
+    ctx.stroke();
 
     const textMeasurement = this._getTextMeasurement(ctx);
 
@@ -593,12 +599,11 @@ class MarkerChartCanvasImpl extends React.PureComponent<Props> {
 
       // Draw the backgound.
       ctx.fillStyle = GREY_20;
-      ctx.fillRect(0, y - 1, usefulContainerWidth, rowHeight);
-
-      // Draw the borders./*
-      ctx.fillStyle = GREY_30;
-      ctx.fillRect(0, y - 1, usefulContainerWidth, 1);
-      ctx.fillRect(0, y + rowHeight - 1, usefulContainerWidth, 1);
+      ctx.strokeStyle = GREY_30;
+      ctx.beginPath();
+      ctx.rect(0, y - 0.5, containerWidth, rowHeight);
+      ctx.fill();
+      ctx.stroke();
 
       // Draw the text.
       ctx.fillStyle = '#000000';
