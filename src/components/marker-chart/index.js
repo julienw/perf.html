@@ -4,11 +4,14 @@
 
 // @flow
 import * as React from 'react';
-import { TIMELINE_MARGIN_RIGHT } from 'firefox-profiler/app-logic/constants';
 import explicitConnect from 'firefox-profiler/utils/connect';
-import { MarkerChartCanvas } from './Canvas';
+import { MarkerChartCanvas } from './Canvas2';
 import { MarkerChartEmptyReasons } from './MarkerChartEmptyReasons';
 import { MarkerSettings } from 'firefox-profiler/components/shared/MarkerSettings';
+import {
+  withSize,
+  type SizeProps,
+} from 'firefox-profiler/components/shared/WithSize';
 
 import {
   getCommittedRange,
@@ -52,7 +55,6 @@ type DispatchProps = {|
 type StateProps = {|
   +getMarker: (MarkerIndex) => Marker,
   +markerTimingAndBuckets: MarkerTimingAndBuckets,
-  +maxMarkerRows: number,
   +timeRange: StartEndRange,
   +threadsKey: ThreadsKey,
   +previewSelection: PreviewSelection,
@@ -61,7 +63,7 @@ type StateProps = {|
   +timelineTrackOrganization: TimelineTrackOrganization,
 |};
 
-type Props = ConnectedProps<{||}, StateProps, DispatchProps>;
+type Props = ConnectedProps<SizeProps, StateProps, DispatchProps>;
 
 class MarkerChartImpl extends React.PureComponent<Props> {
   _viewport: HTMLDivElement | null = null;
@@ -83,23 +85,12 @@ class MarkerChartImpl extends React.PureComponent<Props> {
 
   _shouldDisplayTooltips = () => this.props.rightClickedMarkerIndex === null;
 
-  _takeViewportRef = (viewport: HTMLDivElement | null) => {
-    this._viewport = viewport;
-  };
-
-  _focusViewport = () => {
-    if (this._viewport) {
-      this._viewport.focus();
-    }
-  };
-
   componentDidMount() {
-    this._focusViewport();
+    //this._focusViewport();
   }
 
   render() {
     const {
-      maxMarkerRows,
       timeRange,
       threadsKey,
       markerTimingAndBuckets,
@@ -112,10 +103,8 @@ class MarkerChartImpl extends React.PureComponent<Props> {
       timelineTrackOrganization,
     } = this.props;
 
-    // The viewport needs to know about the height of what it's drawing, calculate
-    // that here at the top level component.
-    const maxViewportHeight = maxMarkerRows * ROW_HEIGHT;
-
+    let markerNameCounter = 0;
+    let previousName = null;
     return (
       <div
         className="markerChart"
@@ -124,7 +113,7 @@ class MarkerChartImpl extends React.PureComponent<Props> {
         aria-labelledby="marker-chart-tab-button"
       >
         <MarkerSettings />
-        {maxMarkerRows === 0 ? (
+        {markerTimingAndBuckets.length === 0 ? (
           <MarkerChartEmptyReasons />
         ) : (
           <ContextMenuTrigger
@@ -133,48 +122,43 @@ class MarkerChartImpl extends React.PureComponent<Props> {
               className: 'treeViewContextMenu',
             }}
           >
-            <MarkerChartCanvas
-              key={threadsKey}
-              viewportProps={{
-                timeRange,
-                previewSelection,
-                maxViewportHeight,
-                viewportNeedsUpdate,
-                maximumZoom: this.getMaximumZoom(),
-                marginLeft: timelineMarginLeft,
-                marginRight: TIMELINE_MARGIN_RIGHT,
-                containerRef: this._takeViewportRef,
-              }}
-              chartProps={{
-                markerTimingAndBuckets,
-                getMarker,
-                // $FlowFixMe Error introduced by upgrading to v0.96.0. See issue #1936.
-                updatePreviewSelection,
-                changeRightClickedMarker,
-                rangeStart: timeRange.start,
-                rangeEnd: timeRange.end,
-                rowHeight: ROW_HEIGHT,
-                threadsKey,
-                marginLeft: timelineMarginLeft,
-                marginRight: TIMELINE_MARGIN_RIGHT,
-                rightClickedMarkerIndex,
-                shouldDisplayTooltips: this._shouldDisplayTooltips,
-                timelineTrackOrganization,
-              }}
-            />
+            {markerTimingAndBuckets.map((timingOrBucket) => {
+              if (typeof timingOrBucket === 'string') {
+                return (
+                  <div className="markerChart-bucket-name" key={timingOrBucket}>
+                    {timingOrBucket}
+                  </div>
+                );
+              }
+              const { name } = timingOrBucket;
+
+              if (name !== previousName) {
+                markerNameCounter = 0;
+                previousName = name;
+              }
+              return (
+                <MarkerChartCanvas
+                  key={`${name}-${markerNameCounter++}`}
+                  timing={timingOrBucket}
+                  getMarker={getMarker}
+                  // $FlowFixMe Error introduced by upgrading to v0.96.0. See issue #1936.
+                  updatePreviewSelection={updatePreviewSelection}
+                  changeRightClickedMarker={changeRightClickedMarker}
+                  rangeStart={timeRange.start}
+                  rangeEnd={timeRange.end}
+                  height={ROW_HEIGHT}
+                  width={this.props.width}
+                  threadsKey={threadsKey}
+                  rightClickedMarkerIndex={rightClickedMarkerIndex}
+                  shouldDisplayTooltips={this._shouldDisplayTooltips}
+                />
+              );
+            })}
           </ContextMenuTrigger>
         )}
       </div>
     );
   }
-}
-
-// This function is given the MarkerChartCanvas's chartProps.
-function viewportNeedsUpdate(
-  prevProps: { +markerTimingAndBuckets: MarkerTimingAndBuckets },
-  newProps: { +markerTimingAndBuckets: MarkerTimingAndBuckets }
-) {
-  return prevProps.markerTimingAndBuckets !== newProps.markerTimingAndBuckets;
 }
 
 export const MarkerChart = explicitConnect<{||}, StateProps, DispatchProps>({
@@ -184,7 +168,6 @@ export const MarkerChart = explicitConnect<{||}, StateProps, DispatchProps>({
     return {
       getMarker: selectedThreadSelectors.getMarkerGetter(state),
       markerTimingAndBuckets,
-      maxMarkerRows: markerTimingAndBuckets.length,
       timeRange: getCommittedRange(state),
       threadsKey: getSelectedThreadsKey(state),
       previewSelection: getPreviewSelection(state),
@@ -195,5 +178,5 @@ export const MarkerChart = explicitConnect<{||}, StateProps, DispatchProps>({
     };
   },
   mapDispatchToProps: { updatePreviewSelection, changeRightClickedMarker },
-  component: MarkerChartImpl,
+  component: withSize(MarkerChartImpl),
 });
