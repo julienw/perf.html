@@ -7,6 +7,7 @@ import { oneLine } from 'common-tags';
 import queryString from 'query-string';
 import {
   processGeckoProfile,
+  sortLocalThreadsByNameAndRegisterTime,
   unserializeProfileOfArbitraryFormat,
 } from 'firefox-profiler/profile-logic/process-profile';
 import { SymbolStore } from 'firefox-profiler/profile-logic/symbol-store';
@@ -1038,6 +1039,7 @@ export function retrieveProfileFromBrowser(
         rawGeckoProfile
       );
       const profile = processGeckoProfile(unpackedProfile);
+      sortLocalThreadsByNameAndRegisterTime(profile);
       await dispatch(loadProfile(profile, { browserConnection }, initialLoad));
     } catch (error) {
       dispatch(fatalError(error));

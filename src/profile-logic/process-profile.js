@@ -1583,6 +1583,33 @@ function _unserializeProfile({
 }
 
 /**
+ * This function will sort the local threads by their name and register time. It
+ * doesn't sort the global threads.
+ * The goal is mainly to have similar threads showing up together in the profile
+ * viewer, so it doesn't need to be perfect.
+ * This mutates the profile input.
+ */
+export function sortLocalThreadsByNameAndRegisterTime(profile: Profile) {
+  // We use a natural sort, so that "Process 11" comes after "Process 2".
+  // The thread names should be with latin characters only, so let's use the
+  // en-US collator.
+  const naturalSort = new Intl.Collator('en-US', { numeric: true });
+
+  profile.threads.sort((threadA, threadB) => {
+    const { name: nameA, pid: pidA, registerTime: registerTimeA } = threadA;
+    const { name: nameB, pid: pidB, registerTime: registerTimeB } = threadB;
+    if (pidA !== pidB) {
+      // Do not change the order if the pids are different, because we don't
+      // want to reorder processes.
+      return 0;
+    }
+
+    // Sort by name first, by registerTime if equal.
+    return naturalSort.compare(nameA, nameB) || registerTimeA - registerTimeB;
+  });
+}
+
+/**
  * Take some arbitrary profile file from some data source, and turn it into
  * the processed profile format.
  * The profile can be in the form of an array buffer or of a string or of a JSON
@@ -1594,8 +1621,26 @@ function _unserializeProfile({
  *  - Chrome profile: input can be ArrayBuffer or string or JSON object
  *  - `perf script` profile: input can be ArrayBuffer or string
  *  - ART trace: input must be ArrayBuffer
+ *  - DHAT profile: input can be ArrayBuffer or string or JSON object
+ *
+ * The actual conversion is done in convertInputOfArbitraryFormatToProcessedFormat.
+ * This function does some additional processing after the conversion before returning.
  */
 export async function unserializeProfileOfArbitraryFormat(
+  arbitraryFormat: mixed
+): Promise<Profile> {
+  const convertedProfile = await convertInputOfArbitraryFormatToProcessedFormat(
+    arbitraryFormat
+  );
+
+  sortLocalThreadsByNameAndRegisterTime(convertedProfile);
+  return convertedProfile;
+}
+
+/**
+ * See above for the expected input.
+ */
+async function convertInputOfArbitraryFormatToProcessedFormat(
   arbitraryFormat: mixed
 ): Promise<Profile> {
   try {
