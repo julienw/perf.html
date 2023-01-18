@@ -56,8 +56,7 @@ type CanvasProps = {|
  * in the props that are needed for the canvas draw call.
  */
 class TrackProcessCPUCanvas extends React.PureComponent<CanvasProps> {
-  _canvas: null | HTMLCanvasElement = null;
-  _requestedAnimationFrame: boolean = false;
+  _canvasRef = React.createRef<HTMLCanvasElement>();
 
   drawCanvas(canvas: HTMLCanvasElement): void {
     const {
@@ -174,31 +173,18 @@ class TrackProcessCPUCanvas extends React.PureComponent<CanvasProps> {
     }
   }
 
-  _scheduleDraw() {
-    if (!this._requestedAnimationFrame) {
-      this._requestedAnimationFrame = true;
-      window.requestAnimationFrame(() => {
-        this._requestedAnimationFrame = false;
-        const canvas = this._canvas;
-        if (canvas) {
-          this.drawCanvas(canvas);
-        }
-      });
+  _renderCanvas() {
+    const canvas = this._canvasRef.current;
+    if (canvas) {
+      this.drawCanvas(canvas);
     }
   }
 
-  _takeCanvasRef = (canvas: HTMLCanvasElement | null) => {
-    this._canvas = canvas;
-  };
-
   render() {
-    this._scheduleDraw();
+    this._renderCanvas();
 
     return (
-      <canvas
-        className="timelineTrackProcessCPUCanvas"
-        ref={this._takeCanvasRef}
-      />
+      <canvas className="timelineTrackProcessCPUCanvas" ref={this._canvasRef} />
     );
   }
 }

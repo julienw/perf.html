@@ -1282,6 +1282,23 @@ Array [
     0,
   ],
   Array [
+    "clearRect",
+    0,
+    0,
+    80,
+    10,
+  ],
+  Array [
+    "scale",
+    1,
+    1,
+  ],
+  Array [
+    "scale",
+    1,
+    1,
+  ],
+  Array [
     "set globalCompositeOperation",
     "lighter",
   ],
@@ -2618,23 +2635,6 @@ Array [
     10,
     10,
   ],
-  Array [
-    "clearRect",
-    0,
-    0,
-    80,
-    10,
-  ],
-  Array [
-    "scale",
-    1,
-    1,
-  ],
-  Array [
-    "scale",
-    1,
-    1,
-  ],
 ]
 `;
 
@@ -3918,6 +3918,23 @@ Array [
     0,
     0.8,
     0,
+  ],
+  Array [
+    "clearRect",
+    0,
+    0,
+    80,
+    10,
+  ],
+  Array [
+    "scale",
+    1,
+    1,
+  ],
+  Array [
+    "scale",
+    1,
+    1,
   ],
   Array [
     "set globalCompositeOperation",
@@ -5266,23 +5283,6 @@ Array [
     10,
     10,
   ],
-  Array [
-    "clearRect",
-    0,
-    0,
-    80,
-    10,
-  ],
-  Array [
-    "scale",
-    1,
-    1,
-  ],
-  Array [
-    "scale",
-    1,
-    1,
-  ],
 ]
 `;
 
@@ -6566,6 +6566,23 @@ Array [
     0,
     0.8,
     0,
+  ],
+  Array [
+    "clearRect",
+    0,
+    0,
+    80,
+    10,
+  ],
+  Array [
+    "scale",
+    1,
+    1,
+  ],
+  Array [
+    "scale",
+    1,
+    1,
   ],
   Array [
     "set globalCompositeOperation",
@@ -7914,23 +7931,6 @@ Array [
     6.666666666666667,
     10,
   ],
-  Array [
-    "clearRect",
-    0,
-    0,
-    80,
-    10,
-  ],
-  Array [
-    "scale",
-    1,
-    1,
-  ],
-  Array [
-    "scale",
-    1,
-    1,
-  ],
 ]
 `;
 
@@ -9214,6 +9214,23 @@ Array [
     0,
     0.8,
     0,
+  ],
+  Array [
+    "clearRect",
+    0,
+    0,
+    80,
+    10,
+  ],
+  Array [
+    "scale",
+    1,
+    1,
+  ],
+  Array [
+    "scale",
+    1,
+    1,
   ],
   Array [
     "set globalCompositeOperation",

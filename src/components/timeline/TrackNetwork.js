@@ -73,8 +73,7 @@ type CanvasProps = {|
  * in the props that are needed for the canvas draw call.
  */
 class NetworkCanvas extends PureComponent<CanvasProps> {
-  _requestedAnimationFrame: boolean = false;
-  _canvas = React.createRef<HTMLCanvasElement>();
+  _canvasRef = React.createRef<HTMLCanvasElement>();
 
   _hitTest(e: SyntheticMouseEvent<>): MarkerIndex | null {
     const { rangeStart, rangeEnd, networkTiming, width } = this.props;
@@ -138,16 +137,10 @@ class NetworkCanvas extends PureComponent<CanvasProps> {
     this.props.onHoveredMarkerChange(hoveredMarkerIndex, e.pageX, e.pageY);
   };
 
-  _scheduleDraw() {
-    if (!this._requestedAnimationFrame) {
-      this._requestedAnimationFrame = true;
-      window.requestAnimationFrame(() => {
-        this._requestedAnimationFrame = false;
-        const canvas = this._canvas.current;
-        if (canvas) {
-          this.drawCanvas(canvas);
-        }
-      });
+  _renderCanvas() {
+    const canvas = this._canvasRef.current;
+    if (canvas) {
+      this.drawCanvas(canvas);
     }
   }
 
@@ -233,11 +226,11 @@ class NetworkCanvas extends PureComponent<CanvasProps> {
   }
 
   render() {
-    this._scheduleDraw();
+    this._renderCanvas();
     return (
       <canvas
         className="timelineTrackNetworkCanvas"
-        ref={this._canvas}
+        ref={this._canvasRef}
         onMouseMove={this._onMouseMove}
         onMouseLeave={this._onMouseLeave}
       />

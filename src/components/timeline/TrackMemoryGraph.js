@@ -62,8 +62,7 @@ type CanvasProps = {|
  * in the props that are needed for the canvas draw call.
  */
 class TrackMemoryCanvas extends React.PureComponent<CanvasProps> {
-  _canvas: null | HTMLCanvasElement = null;
-  _requestedAnimationFrame: boolean = false;
+  _canvasRef = React.createRef<HTMLCanvasElement>();
   _canvasState: {| renderScheduled: boolean, inView: boolean |} = {
     renderScheduled: false,
     inView: false,
@@ -189,7 +188,7 @@ class TrackMemoryCanvas extends React.PureComponent<CanvasProps> {
     }
   }
 
-  _scheduleDraw() {
+  _renderCanvas() {
     if (!this._canvasState.inView) {
       // Canvas is not in the view. Schedule the render for a later intersection
       // observer callback.
@@ -200,21 +199,11 @@ class TrackMemoryCanvas extends React.PureComponent<CanvasProps> {
     // Canvas is in the view. Render the canvas and reset the schedule state.
     this._canvasState.renderScheduled = false;
 
-    if (!this._requestedAnimationFrame) {
-      this._requestedAnimationFrame = true;
-      window.requestAnimationFrame(() => {
-        this._requestedAnimationFrame = false;
-        const canvas = this._canvas;
-        if (canvas) {
-          this.drawCanvas(canvas);
-        }
-      });
+    const canvas = this._canvasRef.current;
+    if (canvas) {
+      this.drawCanvas(canvas);
     }
   }
-
-  _takeCanvasRef = (canvas: HTMLCanvasElement | null) => {
-    this._canvas = canvas;
-  };
 
   _observerCallback = (inView: boolean, _entry: IntersectionObserverEntry) => {
     this._canvasState.inView = inView;
@@ -223,24 +212,21 @@ class TrackMemoryCanvas extends React.PureComponent<CanvasProps> {
       return;
     }
 
-    this._scheduleDraw();
+    this._renderCanvas();
   };
 
   componentDidMount() {
-    this._scheduleDraw();
+    this._renderCanvas();
   }
 
   componentDidUpdate() {
-    this._scheduleDraw();
+    this._renderCanvas();
   }
 
   render() {
     return (
       <InView onChange={this._observerCallback}>
-        <canvas
-          className="timelineTrackMemoryCanvas"
-          ref={this._takeCanvasRef}
-        />
+        <canvas className="timelineTrackMemoryCanvas" ref={this._canvasRef} />
       </InView>
     );
   }

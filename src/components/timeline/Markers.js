@@ -88,8 +88,7 @@ function _drawRoundedRect(
  * in the props that are needed for the canvas draw call.
  */
 class TimelineMarkersCanvas extends React.PureComponent<CanvasProps> {
-  _canvas: {| current: HTMLCanvasElement | null |} = React.createRef();
-  _requestedAnimationFrame: boolean = false;
+  _canvasRef = React.createRef<HTMLCanvasElement>();
   _canvasState: {| renderScheduled: boolean, inView: boolean |} = {
     renderScheduled: false,
     inView: false,
@@ -206,7 +205,7 @@ class TimelineMarkersCanvas extends React.PureComponent<CanvasProps> {
     ctx.scale(1 / devicePixelRatio, 1 / devicePixelRatio);
   }
 
-  _scheduleDraw() {
+  _renderCanvas() {
     if (!this._canvasState.inView) {
       // Canvas is not in the view. Schedule the render for a later intersection
       // observer callback.
@@ -217,16 +216,10 @@ class TimelineMarkersCanvas extends React.PureComponent<CanvasProps> {
     // Canvas is in the view. Render the canvas and reset the schedule state.
     this._canvasState.renderScheduled = false;
 
-    if (!this._requestedAnimationFrame) {
-      this._requestedAnimationFrame = true;
-      window.requestAnimationFrame(() => {
-        this._requestedAnimationFrame = false;
-        const c = this._canvas.current;
-        if (c) {
-          timeCode('TimelineMarkersImplementation render', () => {
-            this.drawCanvas(c);
-          });
-        }
+    const c = this._canvasRef.current;
+    if (c) {
+      timeCode('TimelineMarkersImplementation render', () => {
+        this.drawCanvas(c);
       });
     }
   }
@@ -238,15 +231,15 @@ class TimelineMarkersCanvas extends React.PureComponent<CanvasProps> {
       return;
     }
 
-    this._scheduleDraw();
+    this._renderCanvas();
   };
 
   componentDidMount() {
-    this._scheduleDraw();
+    this._renderCanvas();
   }
 
   componentDidUpdate() {
-    this._scheduleDraw();
+    this._renderCanvas();
   }
 
   render() {
@@ -254,7 +247,7 @@ class TimelineMarkersCanvas extends React.PureComponent<CanvasProps> {
       <InView onChange={this._observerCallback}>
         <canvas
           className="timelineMarkersCanvas"
-          ref={this._canvas}
+          ref={this._canvasRef}
           onMouseDown={this.props.onMouseDown}
           onMouseMove={this.props.onMouseMove}
           onMouseUp={this.props.onMouseUp}
