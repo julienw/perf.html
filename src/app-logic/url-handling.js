@@ -729,11 +729,8 @@ function convertHiddenLocalTracksByPidFromString(
     }
     const pidString = stringPart.slice(0, stringPart.indexOf('-'));
     const hiddenTracksString = stringPart.slice(pidString.length + 1);
-    const pid = Number(pidString);
     const indexes = decodeUintArrayFromUrlComponent(hiddenTracksString);
-    if (!isNaN(pid) && indexes.every((n) => !isNaN(n))) {
-      hiddenLocalTracksByPid.set(pid, new Set(indexes));
-    }
+    hiddenLocalTracksByPid.set(pidString, new Set(indexes));
   }
   return hiddenLocalTracksByPid;
 }
@@ -774,11 +771,8 @@ function convertLocalTrackOrderByPidFromString(
     }
     const pidString = stringPart.slice(0, stringPart.indexOf('-'));
     const trackOrderString = stringPart.slice(pidString.length + 1);
-    const pid = Number(pidString);
     const indexes = decodeUintArrayFromUrlComponent(trackOrderString);
-    if (!isNaN(pid) && indexes.every((n) => !isNaN(n))) {
-      localTrackOrderByPid.set(pid, indexes);
-    }
+    localTrackOrderByPid.set(pidString, indexes);
   }
 
   return localTrackOrderByPid;
