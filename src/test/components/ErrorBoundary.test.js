@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // @flow
-import * as React from 'react';
 import { stripIndent } from 'common-tags';
 
 import { render } from 'firefox-profiler/test/fixtures/testing-library';

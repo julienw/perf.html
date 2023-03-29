@@ -3,8 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 // @flow
 
-import React from 'react';
-
 import { assertExhaustiveCheck } from 'firefox-profiler/utils/flow';
 import { Localized } from '@fluent/react';
 import type { CodeLoadingSource } from 'firefox-profiler/types';

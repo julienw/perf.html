@@ -37,7 +37,6 @@ jest.mock('../../components/app/ListOfPublishedProfiles', () => ({
   ListOfPublishedProfiles: 'list-of-published-profiles',
 }));
 
-import * as React from 'react';
 import { Provider } from 'react-redux';
 
 import { render } from 'firefox-profiler/test/fixtures/testing-library';

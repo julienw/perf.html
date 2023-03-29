@@ -4,7 +4,6 @@
 
 // @flow
 
-import * as React from 'react';
 import { Provider } from 'react-redux';
 import { showMenu } from '@firefox-devtools/react-contextmenu';
 

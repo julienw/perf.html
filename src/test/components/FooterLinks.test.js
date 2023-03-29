@@ -4,7 +4,6 @@
 
 // @flow
 import fs from 'fs';
-import * as React from 'react';
 import { Provider } from 'react-redux';
 import { FooterLinks } from 'firefox-profiler/components/app/FooterLinks';
 import { AppLocalizationProvider } from 'firefox-profiler/components/app/AppLocalizationProvider';

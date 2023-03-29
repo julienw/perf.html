@@ -4,7 +4,6 @@
 
 // @flow
 
-import React from 'react';
 import classNames from 'classnames';
 import { filterCallNodeAndCategoryPathByImplementation } from 'firefox-profiler/profile-logic/transforms';
 import {

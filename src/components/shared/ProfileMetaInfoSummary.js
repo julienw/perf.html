@@ -3,12 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // @flow
-import React from 'react';
-
-import {
-  formatProductAndVersion,
-  formatPlatform,
-} from 'firefox-profiler/profile-logic/profile-metainfo';
+import { formatProductAndVersion, formatPlatform } from 'firefox-profiler/profile-logic/profile-metainfo';
 
 import './ProfileMetaInfoSummary.css';
 

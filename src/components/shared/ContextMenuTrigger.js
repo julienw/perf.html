@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 // @flow
 
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
 import { ContextMenuTrigger as ReactContextMenuTrigger } from '@firefox-devtools/react-contextmenu';
 import type { MixedObject } from 'firefox-profiler/types';
 

@@ -4,13 +4,7 @@
 
 // @flow
 
-import * as React from 'react';
-
-import {
-  render,
-  screen,
-  cleanup,
-} from 'firefox-profiler/test/fixtures/testing-library';
+import { render, screen, cleanup } from 'firefox-profiler/test/fixtures/testing-library';
 import { Root } from '../../components/app/Root';
 import { autoMockCanvasContext } from '../fixtures/mocks/canvas-context';
 import { getProfileUrlForHash } from '../../actions/receive-profile';

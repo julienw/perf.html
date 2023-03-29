@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 // @flow
 
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
 import { Localized } from '@fluent/react';
 import { Provider } from 'react-redux';
 import { UrlManager } from './UrlManager';

@@ -5,7 +5,7 @@
 // @flow
 
 import { Localized } from '@fluent/react';
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
 import { AppHeader } from './AppHeader';
 import { ListOfPublishedProfiles } from './ListOfPublishedProfiles';
 

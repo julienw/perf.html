@@ -4,7 +4,7 @@
 
 // @flow
 
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
 import {
   getProfileViewOptions,
   getSymbolicationStatus,

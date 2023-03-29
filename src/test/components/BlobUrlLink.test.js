@@ -3,8 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // @flow
-import * as React from 'react';
-
 import { render } from 'firefox-profiler/test/fixtures/testing-library';
 import { BlobUrlLink } from '../../components/shared/BlobUrlLink';
 import { ensureExists } from '../../utils/flow';

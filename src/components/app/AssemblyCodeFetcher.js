@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 // @flow
 
-import React from 'react';
+import { PureComponent } from 'react';
 
 import {
   getProfileOrNull,
@@ -50,7 +50,7 @@ type DispatchProps = {|
 
 type Props = ConnectedProps<{||}, StateProps, DispatchProps>;
 
-class AssemblyCodeFetcherImpl extends React.PureComponent<Props> {
+class AssemblyCodeFetcherImpl extends PureComponent<Props> {
   componentDidMount() {
     this._triggerAssemblyLoadingIfNeeded();
   }

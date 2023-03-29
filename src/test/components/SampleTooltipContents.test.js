@@ -4,7 +4,6 @@
 
 // @flow
 
-import React from 'react';
 import { Provider } from 'react-redux';
 import { TimelineTrackThread } from 'firefox-profiler/components/timeline/TrackThread';
 import { changeImplementationFilter as actionChangeImplementationFilter } from 'firefox-profiler/actions/profile-view';

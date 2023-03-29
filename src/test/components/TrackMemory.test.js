@@ -6,7 +6,6 @@
 
 import type { IndexIntoSamplesTable, CssPixels } from 'firefox-profiler/types';
 
-import * as React from 'react';
 import { Provider } from 'react-redux';
 import { fireEvent } from '@testing-library/react';
 

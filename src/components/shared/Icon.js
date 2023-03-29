@@ -4,7 +4,7 @@
 
 // @flow
 
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
 import explicitConnect from 'firefox-profiler/utils/connect';
 import { getIconClassName } from 'firefox-profiler/selectors/icons';
 import { iconStartLoading } from 'firefox-profiler/actions/icons';

@@ -4,8 +4,6 @@
 
 // @flow
 
-import React from 'react';
-
 import { render, screen } from 'firefox-profiler/test/fixtures/testing-library';
 import { TabBar } from '../../components/app/TabBar';
 import { fireFullClick } from '../fixtures/utils';

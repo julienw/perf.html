@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // @flow
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
 import { withSize } from 'firefox-profiler/components/shared/WithSize';
 import { DivWithTooltip } from 'firefox-profiler/components/tooltip/DivWithTooltip';
 import { oneLine } from 'common-tags';

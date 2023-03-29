@@ -4,7 +4,7 @@
 
 // @flow
 
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
 import { TIMELINE_RULER_HEIGHT } from 'firefox-profiler/app-logic/constants';
 
 import './Ruler.css';
