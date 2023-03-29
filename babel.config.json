@@ -16,7 +16,10 @@
       {
         // When spreading props, use inline object with spread elements
         // directly instead of Babel's `extend` helper or `Object.assign`.
-        "useSpread": true
+        "useSpread": true,
+        // Use the new JSX transform
+        // See https://legacy.reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html
+        "runtime": "automatic"
       }
     ],
     // The "all" property is needed for Flow to properly parse the syntax.

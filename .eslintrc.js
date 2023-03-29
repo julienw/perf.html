@@ -11,6 +11,7 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'plugin:react/recommended',
+    'plugin:react/jsx-runtime', // We use the new JSX transform
     'plugin:flowtype/recommended',
     // This works with the prettier plugin, this needs to be at the end always.
     // Replace it with the "prettier" config if we remove the plugin.
