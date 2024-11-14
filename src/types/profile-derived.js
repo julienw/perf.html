@@ -334,7 +334,7 @@ export type Marker = {|
   category: IndexIntoCategoryList,
   threadId: Tid | null,
   data: MarkerPayload | null,
-  incomplete?: boolean,
+  incomplete?: 'start' | 'end' | boolean,
 |};
 
 /**

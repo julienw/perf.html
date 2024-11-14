@@ -749,7 +749,7 @@ export function deriveMarkersFromRawMarkerTable(
                   fetchStart: endData.startTime,
                   cause: endData.cause,
                 },
-                incomplete: true,
+                incomplete: 'start',
               });
             }
           }
@@ -974,7 +974,7 @@ export function deriveMarkersFromRawMarkerTable(
               category,
               threadId: markerThreadId,
               data,
-              incomplete: true,
+              incomplete: 'start',
             });
           }
         }
@@ -1001,7 +1001,7 @@ export function deriveMarkersFromRawMarkerTable(
         data: rawMarkers.data[startIndex],
         category: rawMarkers.category[startIndex],
         threadId: rawMarkers.threadId ? rawMarkers.threadId[startIndex] : null,
-        incomplete: true,
+        incomplete: 'end',
       });
     }
   }
@@ -1018,7 +1018,7 @@ export function deriveMarkersFromRawMarkerTable(
       category: rawMarkers.category[startIndex],
       threadId: rawMarkers.threadId ? rawMarkers.threadId[startIndex] : null,
       data: rawMarkers.data[startIndex],
-      incomplete: true,
+      incomplete: 'end',
     });
   }
 
